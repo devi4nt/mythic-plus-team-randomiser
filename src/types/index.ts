@@ -47,26 +47,27 @@ export type ClassSpec =
   | "Brewmaster"
   | "Mistweaver"
   | "Devastation"
-  | "Preservation";
+  | "Preservation"
+  | "Augmentation";
 
 export type ClassRole = "DPS" | "TANK" | "HEALING";
 export type ClassFilter = ClassRole | "ALL";
 
 export interface Character {
   name: string;
-  race: string;
+  race?: string;
   class: ClassType;
   active_spec_name: ClassSpec;
   active_spec_role: ClassRole;
-  gender: "male" | "female";
-  faction: "horde" | "alliance";
-  achievement_points: number;
-  honorable_kills: number;
-  region: "eu";
-  realm: "Quel'Thalas" | "Azjol-Nerub";
-  last_crawled_at: string;
-  profile_url: string;
-  profile_banner: string;
+  gender?: "male" | "female";
+  faction?: "horde" | "alliance";
+  achievement_points?: number;
+  honorable_kills?: number;
+  region?: "eu";
+  realm?: "Quel'Thalas" | "Azjol-Nerub";
+  last_crawled_at?: string;
+  profile_url?: string;
+  profile_banner?: string;
 }
 
 export interface Team {
@@ -87,9 +88,22 @@ export interface GuildProfile {
 export interface Member {
   rank: number;
   character: Character;
+  captain?: boolean;
+  pug?: boolean;
 }
 
 export interface IAlert {
   type: "error" | "warning" | "success";
   message: string;
+}
+
+export type Region = "CN" | "EU" | "KR" | "TW" | "US";
+
+export interface IRegion {
+  value: Region;
+  label: string;
+}
+export interface IRealm {
+  value: string;
+  label: string;
 }

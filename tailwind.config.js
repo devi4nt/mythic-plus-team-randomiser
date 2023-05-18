@@ -19,6 +19,9 @@ module.exports = {
           dark: "#333333",
           light: "#b1b5c0",
         },
+        raiderio: {
+          DEFAULT: "#e5a023",
+        },
       },
     },
   },

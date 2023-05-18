@@ -4,7 +4,7 @@ import { ref } from "vue";
 
 withDefaults(
   defineProps<{
-    disabled: boolean;
+    disabled?: boolean;
     type?: "default" | "error" | "warning" | "success" | "info";
   }>(),
   { type: "default" }
@@ -24,7 +24,7 @@ const classes = ref({
     type="button"
     :disabled="disabled"
     class="rounded px-2 py-1 text-xs font-semibold shadow-sm"
-    :class="[disabled ? 'opacity-50 cursor-not-allowed' : '', classes[type]]"
+    :class="[disabled ? 'opacity-75 cursor-default' : '', classes[type]]"
   >
     <slot />
   </button>

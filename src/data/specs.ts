@@ -13,7 +13,7 @@ export const classSpecs: Record<ClassType, ClassSpec[]> = {
   "Demon Hunter": ["Vengeance", "Havoc"],
   "Death Knight": ["Blood", "Unholy", "Frost"],
   Monk: ["Windwalker", "Brewmaster", "Mistweaver"],
-  Evoker: ["Devastation", "Preservation"],
+  Evoker: ["Devastation", "Preservation", "Augmentation"],
 };
 
 export const classSpecRole: Record<
@@ -83,5 +83,6 @@ export const classSpecRole: Record<
   Evoker: {
     Devastation: "DPS",
     Preservation: "HEALING",
+    Augmentation: "DPS",
   },
 };

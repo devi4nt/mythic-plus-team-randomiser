@@ -24,7 +24,7 @@ const roles = ref<ClassFilter[]>(["ALL", "TANK", "DPS", "HEALING"]);
       :type="role === r ? 'success' : 'default'"
       class="w-full"
     >
-      {{ r }}
+      {{ r === "HEALING" ? "HEALER" : r }}
     </Btn>
   </div>
 </template>
