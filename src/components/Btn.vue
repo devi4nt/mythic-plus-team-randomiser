@@ -4,7 +4,7 @@ import { ref } from "vue";
 
 withDefaults(
   defineProps<{
-    disabled: boolean;
+    disabled?: boolean;
     type?: "default" | "error" | "warning" | "success" | "info";
   }>(),
   { type: "default" }

@@ -17,6 +17,9 @@ import { ClassFilter, IAlert, Member, Team } from "./types";
 import { v4 as uuidv4 } from "uuid";
 import { classSpecs, classSpecRole } from "./data/specs";
 import { useMembers } from "./composables/members";
+import Modal from "./components/Modal.vue";
+import { shuffle } from "./utils/array";
+import { pause } from "./utils/time";
 
 const filter = ref("");
 const rank = ref(6);
@@ -29,6 +32,7 @@ const error = ref<string | null>(null);
 const warning = ref<string | null>(null);
 const success = ref<string | null>(null);
 const showTeams = ref(true);
+const fancy = ref(true);
 
 const { members } = useMembers();
 
@@ -116,7 +120,8 @@ function randomMember(members: Ref<Member[]>) {
   const unpickedMembers = members.value.filter(
     (member) => !pickedMembers.value.includes(member)
   );
-  return unpickedMembers.at(Math.floor(Math.random() * unpickedMembers.length));
+  shuffle(unpickedMembers);
+  return unpickedMembers[Math.floor(Math.random() * unpickedMembers.length)];
 }
 
 function selectTank() {
@@ -156,7 +161,7 @@ function reset() {
   selectedMembers.value.length = 0;
 }
 
-function randomise() {
+async function randomise() {
   // reset teams
   teams.value.length = 0;
   pickedMembers.value.length = 0;
@@ -205,6 +210,10 @@ function randomise() {
     if (healer) {
       pickedMembers.value.push(healer);
     }
+    const members = [tank, dps1, dps2, dps3, healer];
+    if (fancy.value) {
+      await flashMembers(teams.value.length + 1, members);
+    }
     teams.value.push({
       id: uuidv4(),
       members: [tank, dps1, dps2, dps3, healer],
@@ -218,6 +227,19 @@ function randomise() {
   } else if (!error.value) {
     success.value = "Teams successfully randomised";
   }
+}
+
+const flashTeam = ref<boolean>();
+const flashMember = ref<Member | undefined>();
+async function flashMembers(team: number, members: Member[]) {
+  flashTeam.value = true;
+  await pause(500);
+  for (let x = 0; x < members.length; x++) {
+    flashMember.value = members[x];
+    await pause(500);
+  }
+  flashMember.value = undefined;
+  flashTeam.value = false;
 }
 
 function startDrag(event: DragEvent, member: Member) {
@@ -291,10 +313,33 @@ function handleTap(event: TouchEvent, member: Member) {
   }
   lastTap = currentTime;
 }
+
+function removeTeam(index: number) {
+  // remove team
+  const [team] = teams.value.splice(index, 1);
+  // them.. remove picked members
+  for (let x = 0; x < team.members.length; x++) {
+    const member = team.members[x];
+    const index = pickedMembers.value.findIndex(
+      (pickedMember) => member === pickedMember
+    );
+    pickedMembers.value.splice(index, 1);
+  }
+}
 </script>
 
 <template>
   <div class="w-full h-full">
+    <Modal v-if="flashMember || flashTeam">
+      <Player
+        v-if="flashMember"
+        class="scale-150"
+        :character="flashMember.character"
+      />
+      <div v-else-if="flashTeam" class="font-bold text-2xl text-gray-400">
+        Team {{ teams.length + 1 }}
+      </div>
+    </Modal>
     <Alert v-if="alert" :type="alert.type" :fixed="true" :timeout="2000">
       {{ alert.message }}
     </Alert>
@@ -345,12 +390,16 @@ function handleTap(event: TouchEvent, member: Member) {
           <div class="font-bold text-gray-400">Players</div>
 
           <div
-            class="border border-dashed rounded-md border-gray-400 h-20 w-full md:w-64 my-2 flex items-center justify-center text-gray-400 text-sm font-bold"
+            class="border border-dashed rounded-md border-gray-400 h-[98px] w-full md:w-64 my-2 flex items-center justify-center text-gray-400 text-sm font-bold"
           >
             Double click or drop players here
           </div>
           <div
-            class="flex justify-between mb-1"
+            class="flex justify-between py-1"
+            :class="{
+              'opacity-50':
+                pickedMembers.length && !pickedMembers.includes(member),
+            }"
             v-for="member in selectedMembers"
             :key="member.character.name"
           >
@@ -394,12 +443,14 @@ function handleTap(event: TouchEvent, member: Member) {
           v-if="showTeams && teams.length"
           class="flex flex-wrap h-max order-2 md:order-3 gap-2 gap-x-4"
         >
-          <PlayerTeam
+          <div
+            class="flex flex-col gap-2"
             v-for="(team, index) in teams"
             :key="team.id"
-            :members="team.members"
-            :index="index"
-          />
+          >
+            <PlayerTeam :members="team.members" :index="index" />
+            <Btn @click="removeTeam(index)" class="font-bold"> REMOVE </Btn>
+          </div>
         </div>
       </div>
     </div>

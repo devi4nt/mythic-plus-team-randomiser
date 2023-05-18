@@ -1,6 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@headlessui/vue': ^1.7.13
   '@heroicons/vue': ^2.0.15
   '@types/animejs': ^3.1.7
   '@types/uuid': ^9.0.1
@@ -30,6 +31,7 @@ specifiers:
   vue: ^3.2.47
 
 dependencies:
+  '@headlessui/vue': 1.7.13_vue@3.2.47
   '@heroicons/vue': 2.0.15_vue@3.2.47
   '@types/uuid': 9.0.1
   '@vueuse/core': 10.1.2_vue@3.2.47
@@ -1312,6 +1314,15 @@ packages:
     dependencies:
       '@hapi/hoek': 9.3.0
     dev: true
+
+  /@headlessui/vue/1.7.13_vue@3.2.47:
+    resolution: {integrity: sha512-obG5TdPdBDfs+jiA1mY29LPFqyJl93Q90EL86ontfRe1B6XvbjPkx+x1aAC5DA18bXbb0Juni1ayDbXo0w1u0A==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      vue: ^3.2.0
+    dependencies:
+      vue: 3.2.47
+    dev: false
 
   /@heroicons/vue/2.0.15_vue@3.2.47:
     resolution: {integrity: sha512-Ab98jXcuYPCDtwOmdr5REtUfJCrZf7cnOnh9bD99bM5h1yfTnCPBKjMmJ9gcmyGu51Dzf11Mx/A7rKxAXjccvg==}
