@@ -27,9 +27,11 @@ const textClass = computed(
 <template>
   <div class="flex items-center gap-1 h-6">
     <div class="w-[22px] scaler -ml-1">
-      <div :class="classClass"></div>
+      <div :class="classClass" :title="character.class"></div>
     </div>
-    <div class="w-[22px] scaler mr-2"><div :class="specClass"></div></div>
+    <div class="w-[22px] scaler mr-2">
+      <div :class="specClass" :title="character.active_spec_name"></div>
+    </div>
     <div class="font-bold" :class="textClass">
       {{ character.name }}
     </div>

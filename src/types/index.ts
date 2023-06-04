@@ -87,6 +87,7 @@ export interface GuildProfile {
 export interface Member {
   rank: number;
   character: Character;
+  captain?: boolean;
 }
 
 export interface IAlert {

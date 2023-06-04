@@ -4,6 +4,7 @@ import "./assets/css/main.css";
 import {
   XMarkIcon,
   ArrowPathRoundedSquareIcon,
+  StarIcon,
   PlusIcon,
 } from "@heroicons/vue/20/solid";
 import Btn from "./components/Btn.vue";
@@ -116,12 +117,23 @@ const rolesText = computed(() => {
 // });
 
 // randomly select a team member
-function randomMember(members: Ref<Member[]>) {
+function randomMember(
+  members: Ref<Member[]>,
+  filter?: (member: Member) => boolean
+) {
   const unpickedMembers = members.value.filter(
-    (member) => !pickedMembers.value.includes(member)
+    (member) =>
+      !pickedMembers.value.includes(member) && (!filter || filter(member))
   );
   shuffle(unpickedMembers);
   return unpickedMembers[Math.floor(Math.random() * unpickedMembers.length)];
+}
+
+function selectCaptain() {
+  return randomMember(
+    ref([...tanks.value, ...damageDealers.value, ...healers.value]),
+    (member: Member) => !!member.captain
+  );
 }
 
 function selectTank() {
@@ -140,6 +152,10 @@ function remove(removeMember: Member) {
   selectedMembers.value = selectedMembers.value.filter((member) => {
     return member !== removeMember;
   });
+}
+
+function toggleCaptain(member: Member) {
+  member.captain = !member.captain;
 }
 
 function toggleSpec(member: Member) {
@@ -168,11 +184,23 @@ async function randomise() {
   error.value = null;
 
   const amount = selectedMembers.value.length / 5;
+
+  // select captains
+  const captains = [];
+  for (let index = 0; index < amount; index++) {
+    const captain = selectCaptain();
+    pickedMembers.value.push(captain);
+    captains.push(captain);
+  }
   // console.log({ amount });
   for (let index = 0; index < amount; index++) {
     // console.log(`picking team: ${index + 1}}`);
     // randomly select a tank
-    const tank = selectTank();
+    const captain = captains[index];
+    const tank =
+      captain && captain.character.active_spec_role === "TANK"
+        ? captain
+        : selectTank();
     if (!tank) {
       if (!teams.value.length) {
         error.value = "Not enough tanks";
@@ -181,7 +209,10 @@ async function randomise() {
     }
     pickedMembers.value.push(tank);
     // randomly select damage dealers
-    const dps1 = selectDamageDealer();
+    const dps1 =
+      captain && captain.character.active_spec_role === "DPS"
+        ? captain
+        : selectDamageDealer();
     if (dps1) {
       pickedMembers.value.push(dps1);
     }
@@ -200,7 +231,10 @@ async function randomise() {
       break;
     }
     // randomly select a healer
-    const healer = selectHealer();
+    const healer =
+      captain && captain.character.active_spec_role === "HEALING"
+        ? captain
+        : selectHealer();
     if (!healer) {
       if (!teams.value.length) {
         error.value = "Not enough healers";
@@ -333,7 +367,7 @@ function removeTeam(index: number) {
     <Modal v-if="flashMember || flashTeam">
       <Player
         v-if="flashMember"
-        class="scale-150"
+        class="scaler"
         :character="flashMember.character"
       />
       <div v-else-if="flashTeam" class="font-bold text-2xl text-gray-400">
@@ -355,7 +389,10 @@ function removeTeam(index: number) {
         class="flex flex-col md:flex-row justify-start gap-4 w-full bg-[#353535]"
       >
         <div class="flex flex-col order-3 md:order-1 gap-2">
-          <div class="font-bold text-gray-400">Roster</div>
+          <div class="flex justify-between">
+            <div class="font-bold text-gray-400">Roster</div>
+            <input type="checkbox" name="fancy" v-model="fancy" />
+          </div>
           <input
             v-model="filter"
             placeholder="Type to filter"
@@ -374,7 +411,9 @@ function removeTeam(index: number) {
               @dragstart="startDrag($event, member)"
             >
               <Player :character="member.character" />
-              <PlusIcon class="h-6 text-gray-400" title="Add" />
+              <span title="Add">
+                <PlusIcon class="h-6 text-gray-400 hover:text-gray-300" />
+              </span>
             </div>
           </div>
           <Alert type="warning" v-if="!filteredMembers.length">
@@ -396,25 +435,33 @@ function removeTeam(index: number) {
           </div>
           <div
             class="flex justify-between py-1"
-            :class="{
-              'opacity-50':
-                pickedMembers.length && !pickedMembers.includes(member),
-            }"
             v-for="member in selectedMembers"
             :key="member.character.name"
           >
             <Player :character="member.character" />
-            <div class="flex">
-              <ArrowPathRoundedSquareIcon
-                @click="toggleSpec(member)"
-                class="h-6 text-gray-400 cursor-pointer"
-                title="Toggle spec"
-              />
-              <XMarkIcon
-                @click="remove(member)"
-                class="h-6 text-gray-400 cursor-pointer"
-                title="Remove"
-              />
+            <div class="flex items-center">
+              <span title="Toggle team captain">
+                <StarIcon
+                  @click="toggleCaptain(member)"
+                  class="h-5 cursor-pointer"
+                  :class="{
+                    'text-gray-400 hover:text-gray-300': !member.captain,
+                    'text-yellow-400': member.captain,
+                  }"
+                />
+              </span>
+              <span title="Toggle spec">
+                <ArrowPathRoundedSquareIcon
+                  @click="toggleSpec(member)"
+                  class="h-6 text-gray-400 hover:text-gray-300 cursor-pointer"
+                />
+              </span>
+              <span title="Remove">
+                <XMarkIcon
+                  @click="remove(member)"
+                  class="h-6 text-gray-400 hover:text-gray-300 cursor-pointer"
+                />
+              </span>
             </div>
           </div>
           <div class="flex gap-2 justify-between w-full">
@@ -448,8 +495,11 @@ function removeTeam(index: number) {
             v-for="(team, index) in teams"
             :key="team.id"
           >
-            <PlayerTeam :members="team.members" :index="index" />
-            <Btn @click="removeTeam(index)" class="font-bold"> REMOVE </Btn>
+            <PlayerTeam
+              :members="team.members"
+              :index="index"
+              @remove="removeTeam(index)"
+            />
           </div>
         </div>
       </div>
@@ -460,5 +510,8 @@ function removeTeam(index: number) {
 <style scoped>
 .drop-zone {
   border: dashed 2px #ccc;
+}
+.scaler {
+  transform: scale(2);
 }
 </style>

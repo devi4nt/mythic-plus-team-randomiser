@@ -2,7 +2,9 @@
 <script setup lang="ts">
 import { Member } from "@/types";
 import Player from "./Player.vue";
+import { XMarkIcon } from "@heroicons/vue/20/solid";
 
+const emit = defineEmits(["remove"]);
 defineProps<{
   index: number;
   members: Member[];
@@ -10,8 +12,16 @@ defineProps<{
 </script>
 
 <template>
-  <div class="flex flex-col gap-1">
-    <div class="font-bold text-gray-400">Team {{ index + 1 }}</div>
+  <div class="flex flex-col gap-1 min-w-[180px] bg-[#303030] p-2 rounded-md">
+    <div class="flex justify-between">
+      <div class="font-bold text-gray-400">Team {{ index + 1 }}</div>
+      <span title="Remove">
+        <XMarkIcon
+          @click="emit('remove')"
+          class="h-6 text-gray-400 hover:text-gray-300 cursor-pointer"
+        />
+      </span>
+    </div>
     <Player
       v-for="member in members"
       :key="member.character.name"
