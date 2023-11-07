@@ -47,7 +47,8 @@ export type ClassSpec =
   | "Brewmaster"
   | "Mistweaver"
   | "Devastation"
-  | "Preservation";
+  | "Preservation"
+  | "Augmentation";
 
 export type ClassRole = "DPS" | "TANK" | "HEALING";
 export type ClassFilter = ClassRole | "ALL";

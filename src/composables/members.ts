@@ -8,7 +8,9 @@ export const useMembers = () => {
     `https://raider.io/api/v1/guilds/profile?region=eu&realm=connected-quel-thalas&name=Blank%20Slate&fields=members`
   ).json<GuildProfile>();
 
-  const members = computed(() => data.value?.members);
+  const members = computed(() =>
+    data.value?.members.filter((m) => m.character.active_spec_name)
+  );
 
   return {
     data,
