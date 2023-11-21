@@ -71,7 +71,7 @@ const filteredMembers = computed<Member[]>(() => {
               .toLowerCase()
               .includes(filter.value.toLowerCase());
           // next.. apply rank filter
-          const rankFilter = member.rank <= rank.value;
+          const rankFilter = member.rank <= rank.value || member.rank === 99;
           // next.. apply role filter
           const roleFilter =
             role.value === "ALL" ||
