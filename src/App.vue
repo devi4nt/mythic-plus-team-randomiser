@@ -21,14 +21,15 @@ import { useMembers } from "./composables/members";
 import Modal from "./components/Modal.vue";
 import { shuffle } from "./utils/array";
 import { pause } from "./utils/time";
+import { useSessionStorage } from "@vueuse/core";
 
 const filter = ref("");
 const rank = ref(6);
 const role = ref<ClassFilter>("ALL");
 const minPlayers = ref(6);
-const teams = ref<Team[]>([]);
+const teams = useSessionStorage<Team[]>("teams", []);
 const pickedMembers = ref<Member[]>([]);
-const selectedMembers = ref<Member[]>([]);
+const selectedMembers = useSessionStorage<Member[]>("selected", []);
 const error = ref<string | null>(null);
 const warning = ref<string | null>(null);
 const success = ref<string | null>(null);
