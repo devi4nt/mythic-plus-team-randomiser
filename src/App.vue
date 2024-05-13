@@ -78,11 +78,14 @@ const filteredMembers = computed<Member[]>(() => {
           const roleFilter =
             role.value === "ALL" ||
             member.character.active_spec_role === role.value;
+          // next.. hide deleted characters
+          const deletedFilter = member.character.name.search(/-\d+$/) === -1;
           // then.. exclude already selected members
           return (
             textFilter &&
             rankFilter &&
             roleFilter &&
+            deletedFilter &&
             !selectedMembers.value.includes(member)
           );
         })
