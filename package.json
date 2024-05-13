@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve --port 3010",
+    "dev": "vue-cli-service serve --port 3010",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "publish": "rsync -avz --delete dist/ merry.earth:~/domains/chris.merry.earth/public_html/team-randomiser"
