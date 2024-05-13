@@ -10,7 +10,7 @@ body { background-color: #353535; }
 }
 
 .spec_death-knight_blood,.spec_death-knight_frost {
-  background-image: url(https://cdnassets.raider.io/assets/img/specs_sprite-f45eb039ab6ac1479939d030fa56cce2.png);
+  background-image: url(../images/specs.png);
   height: 64px;
   width: 64px
 }
@@ -24,7 +24,7 @@ body { background-color: #353535; }
 }
 
 .spec_death-knight_unholy,.spec_demon-hunter_havoc {
-  background-image: url(https://cdnassets.raider.io/assets/img/specs_sprite-f45eb039ab6ac1479939d030fa56cce2.png);
+  background-image: url(../images/specs.png);
   height: 64px;
   width: 64px
 }
@@ -38,7 +38,7 @@ body { background-color: #353535; }
 }
 
 .spec_demon-hunter_vengeance,.spec_druid_balance {
-  background-image: url(https://cdnassets.raider.io/assets/img/specs_sprite-f45eb039ab6ac1479939d030fa56cce2.png);
+  background-image: url(../images/specs.png);
   height: 64px;
   width: 64px
 }
@@ -52,7 +52,7 @@ body { background-color: #353535; }
 }
 
 .spec_druid_feral,.spec_druid_guardian {
-  background-image: url(https://cdnassets.raider.io/assets/img/specs_sprite-f45eb039ab6ac1479939d030fa56cce2.png);
+  background-image: url(../images/specs.png);
   height: 64px;
   width: 64px
 }
@@ -66,7 +66,7 @@ body { background-color: #353535; }
 }
 
 .spec_druid_restoration,.spec_evoker_augmentation {
-  background-image: url(https://cdnassets.raider.io/assets/img/specs_sprite-f45eb039ab6ac1479939d030fa56cce2.png);
+  background-image: url(../images/specs.png);
   height: 64px;
   width: 64px
 }
@@ -80,7 +80,7 @@ body { background-color: #353535; }
 }
 
 .spec_evoker_devastation,.spec_evoker_preservation {
-  background-image: url(https://cdnassets.raider.io/assets/img/specs_sprite-f45eb039ab6ac1479939d030fa56cce2.png);
+  background-image: url(../images/specs.png);
   height: 64px;
   width: 64px
 }
@@ -94,7 +94,7 @@ body { background-color: #353535; }
 }
 
 .spec_hunter_beast-mastery,.spec_hunter_marksmanship {
-  background-image: url(https://cdnassets.raider.io/assets/img/specs_sprite-f45eb039ab6ac1479939d030fa56cce2.png);
+  background-image: url(../images/specs.png);
   height: 64px;
   width: 64px
 }
@@ -108,7 +108,7 @@ body { background-color: #353535; }
 }
 
 .spec_hunter_survival,.spec_mage_arcane {
-  background-image: url(https://cdnassets.raider.io/assets/img/specs_sprite-f45eb039ab6ac1479939d030fa56cce2.png);
+  background-image: url(../images/specs.png);
   height: 64px;
   width: 64px
 }
@@ -122,7 +122,7 @@ body { background-color: #353535; }
 }
 
 .spec_mage_fire,.spec_mage_frost {
-  background-image: url(https://cdnassets.raider.io/assets/img/specs_sprite-f45eb039ab6ac1479939d030fa56cce2.png);
+  background-image: url(../images/specs.png);
   height: 64px;
   width: 64px
 }
@@ -136,7 +136,7 @@ body { background-color: #353535; }
 }
 
 .spec_monk_brewmaster,.spec_monk_mistweaver {
-  background-image: url(https://cdnassets.raider.io/assets/img/specs_sprite-f45eb039ab6ac1479939d030fa56cce2.png);
+  background-image: url(../images/specs.png);
   height: 64px;
   width: 64px
 }
@@ -150,7 +150,7 @@ body { background-color: #353535; }
 }
 
 .spec_monk_windwalker,.spec_paladin_holy {
-  background-image: url(https://cdnassets.raider.io/assets/img/specs_sprite-f45eb039ab6ac1479939d030fa56cce2.png);
+  background-image: url(../images/specs.png);
   height: 64px;
   width: 64px
 }
@@ -164,7 +164,7 @@ body { background-color: #353535; }
 }
 
 .spec_paladin_protection,.spec_paladin_retribution {
-  background-image: url(https://cdnassets.raider.io/assets/img/specs_sprite-f45eb039ab6ac1479939d030fa56cce2.png);
+  background-image: url(../images/specs.png);
   height: 64px;
   width: 64px
 }
@@ -178,7 +178,7 @@ body { background-color: #353535; }
 }
 
 .spec_priest_discipline,.spec_priest_holy {
-  background-image: url(https://cdnassets.raider.io/assets/img/specs_sprite-f45eb039ab6ac1479939d030fa56cce2.png);
+  background-image: url(../images/specs.png);
   height: 64px;
   width: 64px
 }
@@ -192,7 +192,7 @@ body { background-color: #353535; }
 }
 
 .spec_priest_shadow,.spec_rogue_assassination {
-  background-image: url(https://cdnassets.raider.io/assets/img/specs_sprite-f45eb039ab6ac1479939d030fa56cce2.png);
+  background-image: url(../images/specs.png);
   height: 64px;
   width: 64px
 }
@@ -206,7 +206,7 @@ body { background-color: #353535; }
 }
 
 .spec_rogue_combat,.spec_rogue_outlaw {
-  background-image: url(https://cdnassets.raider.io/assets/img/specs_sprite-f45eb039ab6ac1479939d030fa56cce2.png);
+  background-image: url(../images/specs.png);
   height: 64px;
   width: 64px
 }
@@ -220,7 +220,7 @@ body { background-color: #353535; }
 }
 
 .spec_rogue_subtlety,.spec_shaman_elemental {
-  background-image: url(https://cdnassets.raider.io/assets/img/specs_sprite-f45eb039ab6ac1479939d030fa56cce2.png);
+  background-image: url(../images/specs.png);
   height: 64px;
   width: 64px
 }
@@ -234,7 +234,7 @@ body { background-color: #353535; }
 }
 
 .spec_shaman_enhancement,.spec_shaman_restoration {
-  background-image: url(https://cdnassets.raider.io/assets/img/specs_sprite-f45eb039ab6ac1479939d030fa56cce2.png);
+  background-image: url(../images/specs.png);
   height: 64px;
   width: 64px
 }
@@ -248,7 +248,7 @@ body { background-color: #353535; }
 }
 
 .spec_warlock_affliction,.spec_warlock_demonology {
-  background-image: url(https://cdnassets.raider.io/assets/img/specs_sprite-f45eb039ab6ac1479939d030fa56cce2.png);
+  background-image: url(../images/specs.png);
   height: 64px;
   width: 64px
 }
@@ -262,7 +262,7 @@ body { background-color: #353535; }
 }
 
 .spec_warlock_destruction,.spec_warrior_arms {
-  background-image: url(https://cdnassets.raider.io/assets/img/specs_sprite-f45eb039ab6ac1479939d030fa56cce2.png);
+  background-image: url(../images/specs.png);
   height: 64px;
   width: 64px
 }
@@ -276,7 +276,7 @@ body { background-color: #353535; }
 }
 
 .spec_warrior_fury,.spec_warrior_protection {
-  background-image: url(https://cdnassets.raider.io/assets/img/specs_sprite-f45eb039ab6ac1479939d030fa56cce2.png);
+  background-image: url(../images/specs.png);
   height: 64px;
   width: 64px
 }
@@ -295,7 +295,7 @@ body { background-color: #353535; }
 }
 
 .class_death-knight,.class_demon-hunter {
-  background-image: url(https://cdnassets.raider.io/assets/img/classes_sprite-10eae88147999f6eb57defa5b2fb4a3b.png);
+  background-image: url(../images/classes.png);
   height: 64px;
   width: 64px
 }
@@ -309,7 +309,7 @@ body { background-color: #353535; }
 }
 
 .class_druid,.class_evoker {
-  background-image: url(https://cdnassets.raider.io/assets/img/classes_sprite-10eae88147999f6eb57defa5b2fb4a3b.png);
+  background-image: url(../images/classes.png);
   height: 64px;
   width: 64px
 }
@@ -323,7 +323,7 @@ body { background-color: #353535; }
 }
 
 .class_hunter,.class_mage {
-  background-image: url(https://cdnassets.raider.io/assets/img/classes_sprite-10eae88147999f6eb57defa5b2fb4a3b.png);
+  background-image: url(../images/classes.png);
   height: 64px;
   width: 64px
 }
@@ -337,7 +337,7 @@ body { background-color: #353535; }
 }
 
 .class_monk,.class_paladin {
-  background-image: url(https://cdnassets.raider.io/assets/img/classes_sprite-10eae88147999f6eb57defa5b2fb4a3b.png);
+  background-image: url(../images/classes.png);
   height: 64px;
   width: 64px
 }
@@ -351,7 +351,7 @@ body { background-color: #353535; }
 }
 
 .class_priest,.class_rogue {
-  background-image: url(https://cdnassets.raider.io/assets/img/classes_sprite-10eae88147999f6eb57defa5b2fb4a3b.png);
+  background-image: url(../images/classes.png);
   height: 64px;
   width: 64px
 }
@@ -365,7 +365,7 @@ body { background-color: #353535; }
 }
 
 .class_shaman,.class_warlock {
-  background-image: url(https://cdnassets.raider.io/assets/img/classes_sprite-10eae88147999f6eb57defa5b2fb4a3b.png);
+  background-image: url(../images/classes.png);
   height: 64px;
   width: 64px
 }
@@ -375,7 +375,7 @@ body { background-color: #353535; }
 }
 
 .class_warrior {
-  background-image: url(https://cdnassets.raider.io/assets/img/classes_sprite-10eae88147999f6eb57defa5b2fb4a3b.png);
+  background-image: url(../images/classes.png);
   background-position: 0 -192px;
   height: 64px;
   width: 64px
