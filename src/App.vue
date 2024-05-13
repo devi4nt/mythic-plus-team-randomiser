@@ -12,6 +12,7 @@ import Player from "./components/Player.vue";
 import PlayerTeam from "./components/PlayerTeam.vue";
 import RoleFilter from "./components/RoleFilter.vue";
 import RankFilter from "./components/RankFilter.vue";
+import RaiderIO from "./components/RaiderIO.vue";
 import Alert from "./components/Alert.vue";
 import { Ref, computed, ref, watch } from "vue";
 import { ClassFilter, IAlert, Member, Team } from "./types";
@@ -408,6 +409,7 @@ function removeTeam(index: number) {
     >
       Select {{ minPlayers - selectedMembers.length }} more players
     </Alert>
+    <RaiderIO title="powered by" class="fixed bottom-1.5 right-1.5 h-6 z-50" />
     <div class="flex flex-col w-full pb-10 p-2">
       <div
         class="flex flex-col md:flex-row justify-start gap-4 w-full bg-[#353535]"
