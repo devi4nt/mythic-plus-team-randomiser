@@ -1,6 +1,5 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
-import { ref } from "vue";
 import {
   Dialog,
   DialogPanel,
@@ -8,12 +7,16 @@ import {
   TransitionRoot,
 } from "@headlessui/vue";
 
-const open = ref(true);
+const emit = defineEmits(["close"]);
+
+defineProps<{
+  show: boolean;
+}>();
 </script>
 
 <template>
-  <TransitionRoot as="template" :show="open">
-    <Dialog as="div" class="relative z-10" @close="open = false">
+  <TransitionRoot as="template" :show="show">
+    <Dialog as="div" class="relative z-10" @close="emit('close')">
       <TransitionChild
         as="template"
         enter="ease-out duration-300"

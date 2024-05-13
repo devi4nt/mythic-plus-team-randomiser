@@ -6,6 +6,7 @@ import {
   ArrowPathRoundedSquareIcon,
   StarIcon,
   PlusIcon,
+  Cog6ToothIcon,
 } from "@heroicons/vue/20/solid";
 import Btn from "./components/Btn.vue";
 import Player from "./components/Player.vue";
@@ -14,15 +15,16 @@ import RoleFilter from "./components/RoleFilter.vue";
 import RankFilter from "./components/RankFilter.vue";
 import RaiderIO from "./components/RaiderIO.vue";
 import Alert from "./components/Alert.vue";
+import Modal from "./components/Modal.vue";
 import { Ref, computed, ref, watch } from "vue";
 import { ClassFilter, IAlert, Member, Team } from "./types";
 import { v4 as uuidv4 } from "uuid";
 import { classSpecs, classSpecRole } from "./data/specs";
 import { useMembers } from "./composables/members";
-import Modal from "./components/Modal.vue";
 import { shuffle } from "./utils/array";
 import { pause } from "./utils/time";
-import { useSessionStorage } from "@vueuse/core";
+import { useSessionStorage, watchDebounced } from "@vueuse/core";
+import ModalSettings from "./components/ModalSettings.vue";
 
 const filter = ref("");
 const rank = ref(6);
@@ -38,7 +40,13 @@ const success = ref<string | null>(null);
 const showTeams = ref(true);
 const fancy = ref(true);
 
-const { members } = useMembers();
+const region = useSessionStorage<string>("region", "eu");
+const guild = useSessionStorage<string>("guild", "Blank Slate");
+const realm = useSessionStorage<string>("server", "connected-quel-thalas");
+
+const showSettings = ref(false);
+
+const { members, isFetching } = useMembers(region, realm, guild);
 
 const tanks = computed(() =>
   selectedMembers.value.filter((member) => {
@@ -389,7 +397,19 @@ function removeTeam(index: number) {
 
 <template>
   <div class="w-full h-full">
-    <Modal v-if="flashMember || flashTeam">
+    <ModalSettings
+      :show="showSettings"
+      @close="showSettings = false"
+      :region="region"
+      :realm="realm"
+      :guild="guild"
+      @update="
+        (data) => {
+          ({ region, realm, guild } = data);
+        }
+      "
+    />
+    <Modal v-if="flashMember || flashTeam" :show="true">
       <Player
         v-if="flashMember"
         class="scaler"
@@ -409,7 +429,7 @@ function removeTeam(index: number) {
     >
       Select {{ minPlayers - selectedMembers.length }} more players
     </Alert>
-    <RaiderIO title="powered by" class="fixed bottom-1.5 right-1.5 h-6 z-50" />
+    <RaiderIO title="powered by" class="fixed bottom-1.5 right-1.5 h-6 z-10" />
     <div class="flex flex-col w-full pb-10 p-2">
       <div
         class="flex flex-col md:flex-row justify-start gap-4 w-full bg-[#353535]"
@@ -417,7 +437,17 @@ function removeTeam(index: number) {
         <div class="flex flex-col order-3 md:order-1 gap-2">
           <div class="flex justify-between">
             <div class="font-bold text-gray-400">Roster</div>
-            <input type="checkbox" name="fancy" v-model="fancy" />
+            <div class="flex items-center gap-2">
+              <Cog6ToothIcon
+                @click="showSettings = !showSettings"
+                class="h-5 cursor-pointer"
+                :class="{
+                  'text-gray-400 hover:text-gray-300': !showSettings,
+                  'text-yellow-400': showSettings,
+                }"
+              />
+              <input type="checkbox" name="fancy" v-model="fancy" />
+            </div>
           </div>
           <input
             v-model="filter"
@@ -429,6 +459,7 @@ function removeTeam(index: number) {
           <div>
             <div
               class="flex justify-between hover:bg-[#454545] cursor-pointer py-1"
+              :class="{ 'opacity-40': isFetching }"
               v-for="member in filteredMembers"
               :key="member.character.name"
               :draggable="true"

@@ -57,3 +57,9 @@
     </svg>
   </div>
 </template>
+
+<style scoped>
+svg {
+  filter: drop-shadow(1px 1px 2px rgb(0 0 0 / 0.4));
+}
+</style>
