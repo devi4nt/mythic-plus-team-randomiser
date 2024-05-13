@@ -26,6 +26,7 @@ defineProps<{
       v-for="member in members"
       :key="member.character.name"
       :character="member.character"
+      :pug="member.pug"
     />
   </div>
 </template>

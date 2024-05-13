@@ -30,6 +30,7 @@ const minPlayers = ref(6);
 const teams = useSessionStorage<Team[]>("teams", []);
 const pickedMembers = ref<Member[]>([]);
 const selectedMembers = useSessionStorage<Member[]>("selected", []);
+const pugs = useSessionStorage<Member[]>("pugs", []);
 const error = ref<string | null>(null);
 const warning = ref<string | null>(null);
 const success = ref<string | null>(null);
@@ -153,6 +154,10 @@ function remove(removeMember: Member) {
   selectedMembers.value = selectedMembers.value.filter((member) => {
     return member !== removeMember;
   });
+
+  pugs.value = pugs.value.filter((member) => {
+    return member !== removeMember;
+  });
 }
 
 function toggleCaptain(member: Member) {
@@ -167,6 +172,21 @@ function toggleSpec(member: Member) {
   member.character.active_spec_role =
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     classSpecRole[member.character.class][member.character.active_spec_name]!;
+}
+
+function addPug() {
+  const member: Member = {
+    rank: 7,
+    character: {
+      name: "PUG",
+      class: "Monk",
+      active_spec_name: "Windwalker",
+      active_spec_role: "DPS",
+    },
+    pug: true,
+  };
+  selectedMembers.value.push(member);
+  pugs.value.push(member);
 }
 
 function reset() {
@@ -439,7 +459,7 @@ function removeTeam(index: number) {
             v-for="member in selectedMembers"
             :key="member.character.name"
           >
-            <Player :character="member.character" />
+            <Player :character="member.character" :pug="member.pug" />
             <div class="flex items-center">
               <span title="Toggle team captain">
                 <StarIcon
@@ -478,13 +498,16 @@ function removeTeam(index: number) {
             >
               PICK TEAMS
             </Btn>
-            <Btn
-              :disabled="!selectedMembers.length && !teams.length"
-              @click="reset()"
-              class="font-bold"
-            >
-              RESET
-            </Btn>
+            <div class="flex gap-2">
+              <Btn @click="addPug()" class="font-bold"> PUG </Btn>
+              <Btn
+                :disabled="!selectedMembers.length && !teams.length"
+                @click="reset()"
+                class="font-bold"
+              >
+                RESET
+              </Btn>
+            </div>
           </div>
         </div>
         <div
