@@ -33,7 +33,7 @@ defineProps<{
 
       <div class="fixed inset-0 z-10 overflow-y-auto">
         <div
-          class="flex min-h-full justify-center p-4 text-center items-center sm:p-0"
+          class="flex min-h-full justify-center p-4 text-center items-end md:items-center sm:p-0"
         >
           <TransitionChild
             as="template"
@@ -44,7 +44,7 @@ defineProps<{
             leave-from="opacity-100 translate-y-0 sm:scale-100"
             leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
-            <DialogPanel>
+            <DialogPanel class="w-full max-w-lg">
               <slot />
             </DialogPanel>
           </TransitionChild>

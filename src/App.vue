@@ -12,41 +12,56 @@ import Btn from "./components/Btn.vue";
 import Player from "./components/Player.vue";
 import PlayerTeam from "./components/PlayerTeam.vue";
 import RoleFilter from "./components/RoleFilter.vue";
-import RankFilter from "./components/RankFilter.vue";
+// import RankFilter from "./components/RankFilter.vue";
 import RaiderIO from "./components/RaiderIO.vue";
 import Alert from "./components/Alert.vue";
 import Modal from "./components/Modal.vue";
 import { Ref, computed, ref, watch } from "vue";
-import { ClassFilter, IAlert, Member, Team } from "./types";
+import { ClassFilter, IAlert, Member, Region, Team } from "./types";
 import { v4 as uuidv4 } from "uuid";
 import { classSpecs, classSpecRole } from "./data/specs";
 import { useMembers } from "./composables/members";
 import { shuffle } from "./utils/array";
 import { pause } from "./utils/time";
-import { useSessionStorage, watchDebounced } from "@vueuse/core";
+import { useSessionStorage, useTimeoutFn } from "@vueuse/core";
 import ModalSettings from "./components/ModalSettings.vue";
+import Loader from "./components/Loader.vue";
 
 const filter = ref("");
-const rank = ref(6);
+// const rank = ref(6);
 const role = ref<ClassFilter>("ALL");
 const minPlayers = ref(6);
 const teams = useSessionStorage<Team[]>("teams", []);
 const pickedMembers = ref<Member[]>([]);
 const selectedMembers = useSessionStorage<Member[]>("selected", []);
 const pugs = useSessionStorage<Member[]>("pugs", []);
+const fatal = ref<string | null>(null);
 const error = ref<string | null>(null);
 const warning = ref<string | null>(null);
 const success = ref<string | null>(null);
 const showTeams = ref(true);
 const fancy = ref(true);
 
-const region = useSessionStorage<string>("region", "eu");
-const guild = useSessionStorage<string>("guild", "Blank Slate");
-const realm = useSessionStorage<string>("server", "connected-quel-thalas");
+const region = useSessionStorage<Region>("region", "EU");
+const realm = useSessionStorage<string>("realm", "");
+const guild = useSessionStorage<string>("guild", "");
 
 const showSettings = ref(false);
 
-const { members, isFetching } = useMembers(region, realm, guild);
+const { members, isFetching, statusCode } = useMembers(region, realm, guild);
+
+watch(
+  statusCode,
+  (code) => {
+    if (code === 400) {
+      fatal.value =
+        "Could not find requested guild, please double check the guild name, realm and try again.";
+    } else if (/^2/.test(String(code))) {
+      fatal.value = null;
+    }
+  },
+  { immediate: true }
+);
 
 const tanks = computed(() =>
   selectedMembers.value.filter((member) => {
@@ -82,7 +97,7 @@ const filteredMembers = computed<Member[]>(() => {
               .toLowerCase()
               .includes(filter.value.toLowerCase());
           // next.. apply rank filter
-          const rankFilter = member.rank <= rank.value || member.rank === 99;
+          // const rankFilter = member.rank <= rank.value || member.rank === 99;
           // next.. apply role filter
           const roleFilter =
             role.value === "ALL" ||
@@ -92,7 +107,7 @@ const filteredMembers = computed<Member[]>(() => {
           // then.. exclude already selected members
           return (
             textFilter &&
-            rankFilter &&
+            // rankFilter &&
             roleFilter &&
             deletedFilter &&
             !selectedMembers.value.includes(member)
@@ -309,12 +324,14 @@ async function flashMembers(team: number, members: Member[]) {
   flashTeam.value = false;
 }
 
+const dragging = ref<boolean>(false);
 function startDrag(event: DragEvent, member: Member) {
   if (event.dataTransfer) {
     // console.log(member);
     event.dataTransfer.dropEffect = "move";
     event.dataTransfer.effectAllowed = "move";
     event.dataTransfer.setData("characterName", member.character.name);
+    dragging.value = true;
   }
 }
 
@@ -331,6 +348,10 @@ function onDrop(event: DragEvent) {
   }
 }
 
+function stopDrag() {
+  dragging.value = false;
+}
+
 const alert = ref<IAlert | undefined>();
 
 watch(
@@ -338,7 +359,7 @@ watch(
   () => {
     if (error.value) {
       alert.value = { type: "error", message: error.value };
-      setTimeout(() => {
+      useTimeoutFn(() => {
         alert.value = undefined;
         error.value = null;
       }, 2500);
@@ -347,7 +368,7 @@ watch(
         type: "warning",
         message: warning.value,
       };
-      setTimeout(() => {
+      useTimeoutFn(() => {
         alert.value = undefined;
         warning.value = null;
       }, 2500);
@@ -356,7 +377,7 @@ watch(
         type: "success",
         message: success.value,
       };
-      setTimeout(() => {
+      useTimeoutFn(() => {
         alert.value = undefined;
         success.value = null;
       }, 2500);
@@ -396,9 +417,15 @@ function removeTeam(index: number) {
 </script>
 
 <template>
-  <div class="w-full h-full">
+  <div
+    class="w-full h-full"
+    @drop="stopDrag()"
+    @dragover.prevent
+    @dragenter.prevent
+  >
     <ModalSettings
-      :show="showSettings"
+      :show="showSettings || !region || !realm || !guild"
+      :prevent-close="!region || !realm || !guild"
       @close="showSettings = false"
       :region="region"
       :realm="realm"
@@ -419,8 +446,14 @@ function removeTeam(index: number) {
         Team {{ teams.length + 1 }}
       </div>
     </Modal>
-    <Alert v-if="alert" :type="alert.type" :fixed="true" :timeout="2000">
+    <Alert v-if="fatal" type="error" :fixed="true">
+      {{ fatal }}
+    </Alert>
+    <Alert v-else-if="alert" :type="alert.type" :fixed="true" :timeout="2000">
       {{ alert.message }}
+    </Alert>
+    <Alert v-else-if="!region || !realm || !guild" :fixed="true" type="warning">
+      Please select a region, realm and guild.
     </Alert>
     <Alert
       v-else-if="selectedMembers.length < minPlayers"
@@ -436,7 +469,10 @@ function removeTeam(index: number) {
       >
         <div class="flex flex-col order-3 md:order-1 gap-2">
           <div class="flex justify-between">
-            <div class="font-bold text-gray-400">Roster</div>
+            <div class="flex">
+              <div class="font-bold text-gray-400">Roster</div>
+              <Loader v-if="isFetching" />
+            </div>
             <div class="flex items-center gap-2">
               <Cog6ToothIcon
                 @click="showSettings = !showSettings"
@@ -454,8 +490,13 @@ function removeTeam(index: number) {
             placeholder="Type to filter"
             class="text-gray-400 border rounded-md border-gray-400 bg-[#353535] px-2 py-1"
           />
-          <RankFilter @update="rank = $event" :rank="rank" />
+          <!-- <RankFilter @update="rank = $event" :rank="rank" /> -->
           <RoleFilter @update="role = $event" :role="role" />
+          <div
+            class="w-full my-2 flex items-center justify-center text-gray-400 text-sm font-bold"
+          >
+            Double click to select players
+          </div>
           <div>
             <div
               class="flex justify-between hover:bg-[#454545] cursor-pointer py-1"
@@ -486,9 +527,14 @@ function removeTeam(index: number) {
           <div class="font-bold text-gray-400">Players</div>
 
           <div
-            class="border border-dashed rounded-md border-gray-400 h-[98px] w-full md:w-64 my-2 flex items-center justify-center text-gray-400 text-sm font-bold"
+            class="border border-dashed rounded-md h-[98px] w-full md:w-64 my-2 flex items-center justify-center text-sm font-bold"
+            :class="[
+              dragging
+                ? 'border-green-400 text-green-400'
+                : 'border-gray-400 text-gray-400',
+            ]"
           >
-            Double click or drop players here
+            Drag &amp; drop players here
           </div>
           <div
             class="flex justify-between py-1"

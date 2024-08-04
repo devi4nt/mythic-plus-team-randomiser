@@ -96,3 +96,14 @@ export interface IAlert {
   type: "error" | "warning" | "success";
   message: string;
 }
+
+export type Region = "CN" | "EU" | "KR" | "TW" | "US";
+
+export interface IRegion {
+  value: Region;
+  label: string;
+}
+export interface IRealm {
+  value: string;
+  label: string;
+}
