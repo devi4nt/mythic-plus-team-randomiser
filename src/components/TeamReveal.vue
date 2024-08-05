@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { Member } from "@/types";
+import { Team } from "@/types";
 import Player from "./Player.vue";
 import { computed, ref, watch } from "vue";
 import { useIntervalFn } from "@vueuse/core";
 import ConfettiExplosion from "vue-confetti-explosion";
+import { classColourLookup } from "@/utils/colours";
 
 const props = defineProps<{
   number: number;
-  team: Member[];
+  team: Team;
 }>();
 
 const showConfetti = ref(false);
@@ -15,48 +16,22 @@ const team = computed(() => props.team);
 const amount = ref(0);
 
 const colors = computed(() =>
-  team.value.map((member) => {
+  team.value.members.map((member) => {
     if (member.pug) {
       return "#e5a023";
-    } else if (member.character.class === "Demon Hunter") {
-      return "#a330c9";
-    } else if (member.character.class === "Death Knight") {
-      return "#c41f3b";
-    } else if (member.character.class === "Druid") {
-      return "#ff7d0a";
-    } else if (member.character.class === "Hunter") {
-      return "#abd473";
-    } else if (member.character.class === "Mage") {
-      return "#69ccf0";
-    } else if (member.character.class === "Monk") {
-      return "#00ff96";
-    } else if (member.character.class === "Paladin") {
-      return "#f58cba";
-    } else if (member.character.class === "Priest") {
-      return "#ffffff";
-    } else if (member.character.class === "Rogue") {
-      return "#fff569";
-    } else if (member.character.class === "Shaman") {
-      return "#0070de";
-    } else if (member.character.class === "Warlock") {
-      return "#9482c9";
-    } else if (member.character.class === "Warrior") {
-      return "#c79c6e";
-    } else if (member.character.class === "Evoker") {
-      return "#33937f";
     }
-    return "#454545";
+    return classColourLookup[member.character.class];
   })
 );
 
 watch(
   team,
   () => {
-    amount.value = 1;
+    amount.value = 0;
     showConfetti.value = false;
     const { pause } = useIntervalFn(async () => {
       amount.value++;
-      if (amount.value > 4) {
+      if (amount.value > 5) {
         showConfetti.value = true;
         pause();
       }
@@ -83,14 +58,14 @@ watch(
           Team {{ number }}
         </div>
         <div>
-          <template v-for="(member, index) in team" :key="index">
-            <Player
-              v-if="amount > index"
-              class="scaler ml-36 my-6"
-              :character="member.character"
-              :pug="member.pug"
-            />
-          </template>
+          <Player
+            v-for="(member, index) in team.members"
+            :key="index"
+            class="scaler ml-36 my-6 transition-opacity duration-300"
+            :class="amount > index ? 'opacity-100' : 'opacity-0'"
+            :character="member.character"
+            :pug="member.pug"
+          />
         </div>
       </div>
     </div>

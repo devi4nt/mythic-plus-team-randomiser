@@ -19,8 +19,7 @@ const roles = ref<ClassFilter[]>(["ALL", "TANK", "DPS", "HEALING"]);
     <Btn
       v-for="r in roles"
       :key="r"
-      :disabled="role === r"
-      @click="emit('update', r)"
+      @click="role !== r ? emit('update', r) : null"
       :type="role === r ? 'success' : 'default'"
       class="w-full"
     >
