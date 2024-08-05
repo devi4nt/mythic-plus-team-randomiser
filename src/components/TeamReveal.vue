@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { Team } from "@/types";
-import Player from "./Player.vue";
-import { computed, ref, watch } from "vue";
-import { useIntervalFn } from "@vueuse/core";
-import ConfettiExplosion from "vue-confetti-explosion";
-import { classColourLookup } from "@/utils/colours";
+import type { Team } from '../types';
+import Player from './Player.vue';
+import { computed, ref, watch } from 'vue';
+import { useIntervalFn } from '@vueuse/core';
+import ConfettiExplosion from 'vue-confetti-explosion';
+import { classColourLookup } from '../utils/colours';
 
 const props = defineProps<{
   number: number;
@@ -18,7 +18,7 @@ const amount = ref(0);
 const colors = computed(() =>
   team.value.members.map((member) => {
     if (member.pug) {
-      return "#e5a023";
+      return '#e5a023';
     }
     return classColourLookup[member.character.class];
   })
@@ -51,12 +51,8 @@ watch(
     />
     <div class="fixed inset-0 bg-[#454545] bg-opacity-75 transition-opacity" />
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-      <div
-        class="flex flex-col bg-[#494949] w-[400px] h-[340px] gap-2 rounded-md drop-shadow-md"
-      >
-        <div class="font-bold text-4xl text-gray-400 pl-4 pt-4">
-          Team {{ number }}
-        </div>
+      <div class="flex flex-col bg-[#494949] w-[400px] h-[340px] gap-2 rounded-md drop-shadow-md">
+        <div class="font-bold text-4xl text-gray-400 pl-4 pt-4">Team {{ number }}</div>
         <div>
           <Player
             v-for="(member, index) in team.members"

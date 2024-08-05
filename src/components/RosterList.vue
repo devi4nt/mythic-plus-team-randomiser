@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { PlusIcon } from "@heroicons/vue/20/solid";
-import { Member } from "@/types";
-import Loader from "./Loader.vue";
+import { PlusIcon } from '@heroicons/vue/20/solid';
+import type { Member } from '../types';
+import Loader from './Loader.vue';
 // import RankFilter from "./RankFilter.vue";
-import RoleFilter from "./RoleFilter.vue";
-import Player from "./Player.vue";
-import Alert from "./Alert.vue";
-import { useMembersStore } from "@/stores/members.store";
-import { storeToRefs } from "pinia";
+import RoleFilter from './RoleFilter.vue';
+import Player from './Player.vue';
+import Alert from './Alert.vue';
+import { useMembersStore } from '../stores/members.store';
+import { storeToRefs } from 'pinia';
 
 const emit = defineEmits<{
-  (event: "dragging", dragging: boolean): void;
+  (event: 'dragging', dragging: boolean): void;
 }>();
 
 defineProps<{
@@ -24,16 +24,16 @@ const {
   filter,
   isFetching,
   selectedMembers,
-  filteredMembers,
+  filteredMembers
 } = storeToRefs(members);
 
 function startDrag(event: DragEvent, member: Member) {
   if (event.dataTransfer) {
     // console.log(member);
-    event.dataTransfer.dropEffect = "move";
-    event.dataTransfer.effectAllowed = "move";
-    event.dataTransfer.setData("characterName", member.character.name);
-    emit("dragging", true);
+    event.dataTransfer.dropEffect = 'move';
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('characterName', member.character.name);
+    emit('dragging', true);
   }
 }
 
@@ -49,7 +49,7 @@ function handleTap(event: TouchEvent, member: Member) {
   } else {
     tapTimeout = setTimeout(() => {
       clearTimeout(tapTimeout);
-    }, 500);
+    }, 500) as unknown as number;
   }
   lastTap = currentTime;
 }
@@ -68,13 +68,8 @@ function handleTap(event: TouchEvent, member: Member) {
     />
     <!-- <RankFilter @update="rank = $event" :rank="rank" /> -->
     <RoleFilter @update="role = $event" :role="role" />
-    <div class="w-full flex text-gray-400 text-sm">
-      Double click to select players
-    </div>
-    <div
-      class="grid grid-cols-2 md:grid-cols-1 gap-x-4"
-      :class="{ 'opacity-40': isFetching }"
-    >
+    <div class="w-full flex text-gray-400 text-sm">Double click to select players</div>
+    <div class="grid grid-cols-2 md:grid-cols-1 gap-x-4" :class="{ 'opacity-40': isFetching }">
       <div
         class="flex justify-between hover:bg-[#454545] cursor-pointer py-1"
         v-for="member in filteredMembers"
@@ -90,9 +85,7 @@ function handleTap(event: TouchEvent, member: Member) {
         </span>
       </div>
     </div>
-    <Alert type="warning" v-if="!filteredMembers.length">
-      No matching players
-    </Alert>
+    <Alert type="warning" v-if="!filteredMembers.length"> No matching players </Alert>
   </div>
 </template>
 

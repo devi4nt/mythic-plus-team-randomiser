@@ -1,9 +1,9 @@
-import { defineStore } from "pinia";
-import { ref, watch } from "vue";
-import { useTimeoutFn } from "@vueuse/core";
-import { IAlert } from "@/types";
+import { defineStore } from 'pinia';
+import { ref, watch } from 'vue';
+import { useTimeoutFn } from '@vueuse/core';
+import type { IAlert } from '../types';
 
-export const useAlertStore = defineStore("alert", () => {
+export const useAlertStore = defineStore('alert', () => {
   const fatal = ref<string>();
   const error = ref<string>();
   const warning = ref<string>();
@@ -14,15 +14,15 @@ export const useAlertStore = defineStore("alert", () => {
     () => [error.value, warning.value, success.value],
     () => {
       if (error.value) {
-        alert.value = { type: "error", message: error.value };
+        alert.value = { type: 'error', message: error.value };
         useTimeoutFn(() => {
           alert.value = undefined;
           error.value = undefined;
         }, 2500);
       } else if (warning.value) {
         alert.value = {
-          type: "warning",
-          message: warning.value,
+          type: 'warning',
+          message: warning.value
         };
         useTimeoutFn(() => {
           alert.value = undefined;
@@ -30,8 +30,8 @@ export const useAlertStore = defineStore("alert", () => {
         }, 5000);
       } else if (success.value) {
         alert.value = {
-          type: "success",
-          message: success.value,
+          type: 'success',
+          message: success.value
         };
         useTimeoutFn(() => {
           alert.value = undefined;
@@ -46,6 +46,6 @@ export const useAlertStore = defineStore("alert", () => {
     fatal,
     error,
     warning,
-    success,
+    success
   };
 });

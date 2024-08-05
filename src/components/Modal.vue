@@ -1,13 +1,8 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
-import {
-  Dialog,
-  DialogPanel,
-  TransitionChild,
-  TransitionRoot,
-} from "@headlessui/vue";
+import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue';
 
-const emit = defineEmits(["close"]);
+const emit = defineEmits(['close']);
 
 defineProps<{
   show: boolean;
@@ -26,9 +21,7 @@ defineProps<{
         leave-from="opacity-100"
         leave-to="opacity-0"
       >
-        <div
-          class="fixed inset-0 bg-[#454545] bg-opacity-75 transition-opacity"
-        />
+        <div class="fixed inset-0 bg-[#454545] bg-opacity-75 transition-opacity" />
       </TransitionChild>
 
       <div class="fixed inset-0 z-10 overflow-y-auto">

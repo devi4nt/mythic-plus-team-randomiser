@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import Modal from "./Modal.vue";
-import Btn from "./Btn.vue";
-import { XMarkIcon } from "@heroicons/vue/20/solid";
-import { regions, realms } from "@/data/realms";
-import type { Region } from "@/types";
+import { computed, ref } from 'vue';
+import Modal from './Modal.vue';
+import Btn from './Btn.vue';
+import { XMarkIcon } from '@heroicons/vue/20/solid';
+import { regions, realms } from '../data/realms';
+import type { Region } from '../types';
 
 const emit = defineEmits<{
-  (event: "close"): void;
+  (event: 'close'): void;
   (
-    event: "update",
+    event: 'update',
     data: {
       region: Region;
       realm: string;
@@ -36,25 +36,21 @@ const guildName = ref(props.guild);
 const autoPug = ref(props.autoPug);
 const fancy = ref(props.fancy);
 
-const regionsSorted = computed(() =>
-  regions.sort((a, b) => a.label.localeCompare(b.label))
-);
+const regionsSorted = computed(() => regions.sort((a, b) => a.label.localeCompare(b.label)));
 
 const regionRealms = computed(() =>
-  (realms[regionName.value] ?? []).sort((a, b) =>
-    a.label.localeCompare(b.label)
-  )
+  (realms[regionName.value] ?? []).sort((a, b) => a.label.localeCompare(b.label))
 );
 
 function update() {
-  emit("update", {
+  emit('update', {
     region: regionName.value,
     realm: realmName.value,
     guild: guildName.value,
     autoPug: autoPug.value,
-    fancy: fancy.value,
+    fancy: fancy.value
   });
-  emit("close");
+  emit('close');
 }
 </script>
 
@@ -82,11 +78,7 @@ function update() {
             class="text-gray-400 border rounded-md border-gray-400 bg-[#353535] px-2 py-1 w-full"
           >
             <option value="">Select a region</option>
-            <option
-              v-for="region in regionsSorted"
-              :key="region.value"
-              :value="region.value"
-            >
+            <option v-for="region in regionsSorted" :key="region.value" :value="region.value">
               {{ region.label }}
             </option>
           </select>
@@ -98,11 +90,7 @@ function update() {
             class="text-gray-400 border rounded-md border-gray-400 bg-[#353535] px-2 py-1 w-full"
           >
             <option value="">Select a realm</option>
-            <option
-              v-for="realm in regionRealms"
-              :key="realm.value"
-              :value="realm.value"
-            >
+            <option v-for="realm in regionRealms" :key="realm.value" :value="realm.value">
               {{ realm.label }}
             </option>
           </select>
@@ -117,9 +105,7 @@ function update() {
         </div>
       </div>
       <div class="flex flex-col gap-2 mt-4">
-        <div class="text-left text-gray-400 text-sm font-bold">
-          Other settings
-        </div>
+        <div class="text-left text-gray-400 text-sm font-bold">Other settings</div>
         <div class="flex items-center gap-2">
           <div class="w-full text-left text-gray-400">
             Automatically add pugs if there aren't enough real players

@@ -1,16 +1,16 @@
-import { Team } from "@/types";
-import { pause } from "@/utils/time";
-import { useSessionStorage } from "@vueuse/core";
-import { defineStore, storeToRefs } from "pinia";
-import { ref } from "vue";
-import { useConfigStore } from "./config.store";
+import type { Team } from '../types';
+import { pause } from '../utils/time';
+import { useSessionStorage } from '@vueuse/core';
+import { defineStore, storeToRefs } from 'pinia';
+import { ref } from 'vue';
+import { useConfigStore } from './config.store';
 
-export const useTeamsStore = defineStore("teams", () => {
+export const useTeamsStore = defineStore('teams', () => {
   const configStore = useConfigStore();
   const { fancy } = storeToRefs(configStore);
 
   const showTeam = ref<Team>();
-  const teams = useSessionStorage<Team[]>("teams", []);
+  const teams = useSessionStorage<Team[]>('teams', []);
 
   function reset() {
     teams.value.length = 0;
@@ -35,6 +35,6 @@ export const useTeamsStore = defineStore("teams", () => {
     showTeam,
     add,
     remove,
-    reset,
+    reset
   };
 });

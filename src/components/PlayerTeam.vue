@@ -1,10 +1,10 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
-import { Member } from "@/types";
-import Player from "./Player.vue";
-import { XMarkIcon } from "@heroicons/vue/20/solid";
+import type { Member } from '../types';
+import Player from './Player.vue';
+import { XMarkIcon } from '@heroicons/vue/20/solid';
 
-const emit = defineEmits(["remove"]);
+const emit = defineEmits(['remove']);
 defineProps<{
   index: number;
   members: Member[];
@@ -12,9 +12,7 @@ defineProps<{
 </script>
 
 <template>
-  <div
-    class="flex flex-col gap-1 min-w-[180px] bg-[#494949] p-2 rounded-md drop-shadow-md"
-  >
+  <div class="flex flex-col gap-1 min-w-[180px] bg-[#494949] p-2 rounded-md drop-shadow-md">
     <div class="flex justify-between">
       <div class="font-bold text-gray-400">Team {{ index + 1 }}</div>
       <span title="Remove">

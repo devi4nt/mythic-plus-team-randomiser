@@ -1,15 +1,11 @@
 <script setup lang="ts">
-import {
-  StarIcon,
-  ArrowPathRoundedSquareIcon,
-  XMarkIcon,
-} from "@heroicons/vue/20/solid";
-import { useMembersStore } from "@/stores/members.store";
-import Player from "./Player.vue";
-import Btn from "./Btn.vue";
-import { storeToRefs } from "pinia";
-import { useConfigStore } from "@/stores/config.store";
-import { useTeamsStore } from "@/stores/teams.store";
+import { StarIcon, ArrowPathRoundedSquareIcon, XMarkIcon } from '@heroicons/vue/20/solid';
+import { useMembersStore } from '../stores/members.store';
+import Player from './Player.vue';
+import Btn from './Btn.vue';
+import { storeToRefs } from 'pinia';
+import { useConfigStore } from '../stores/config.store';
+import { useTeamsStore } from '../stores/teams.store';
 
 defineProps<{
   dragging: boolean;
@@ -25,15 +21,13 @@ const teamsStore = useTeamsStore();
 const { teams } = storeToRefs(teamsStore);
 
 function onDrop(event: DragEvent) {
-  const characterName = event.dataTransfer?.getData("characterName");
+  const characterName = event.dataTransfer?.getData('characterName');
   // console.log("onDrop", event, characterName);
-  const member = filteredMembers.value.find(
-    (member) => member.character.name === characterName
-  );
+  const member = filteredMembers.value.find((member) => member.character.name === characterName);
   if (member) {
     selectedMembers.value.push(member);
   } else {
-    console.error("member not found", characterName);
+    console.error('member not found', characterName);
   }
 }
 </script>
@@ -48,11 +42,7 @@ function onDrop(event: DragEvent) {
     <div class="font-bold text-gray-400">Players</div>
     <div
       class="border border-dashed rounded-md h-[94px] w-full md:w-64 my-2 flex items-center justify-center text-sm font-bold transition-colors"
-      :class="[
-        dragging
-          ? 'border-green-600 text-green-600'
-          : 'border-gray-400 text-gray-400',
-      ]"
+      :class="[dragging ? 'border-green-600 text-green-600' : 'border-gray-400 text-gray-400']"
     >
       Drag &amp; drop players here
     </div>
@@ -69,7 +59,7 @@ function onDrop(event: DragEvent) {
             class="h-5 cursor-pointer"
             :class="{
               'text-gray-400 hover:text-gray-300': !member.captain,
-              'text-raiderio': member.captain,
+              'text-raiderio': member.captain
             }"
           />
         </span>
@@ -101,9 +91,7 @@ function onDrop(event: DragEvent) {
         PICK TEAMS
       </Btn>
       <div class="flex gap-2">
-        <Btn v-if="!autoPug" @click="members.addPug()" class="font-bold">
-          PUG
-        </Btn>
+        <Btn v-if="!autoPug" @click="members.addPug()" class="font-bold"> PUG </Btn>
         <Btn
           :disabled="!selectedMembers.length && !teams.length"
           @click="members.reset()"

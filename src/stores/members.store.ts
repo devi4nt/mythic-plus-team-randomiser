@@ -1,21 +1,15 @@
-import type {
-  ClassFilter,
-  ClassRole,
-  GuildProfile,
-  Member,
-  Team,
-} from "@/types";
-import { useFetch, useSessionStorage } from "@vueuse/core";
-import { defineStore, storeToRefs } from "pinia";
-import { computed, type Ref, ref, watch } from "vue";
-import { useConfigStore } from "./config.store";
-import { shuffle } from "@/utils/array";
-import { classSpecRole, classSpecs } from "@/data/specs";
-import { useAlertStore } from "./alert.store";
-import { v4 as uuidv4 } from "uuid";
-import { useTeamsStore } from "./teams.store";
+import type { ClassFilter, ClassRole, GuildProfile, Member, Team } from '../types';
+import { useFetch, useSessionStorage } from '@vueuse/core';
+import { defineStore, storeToRefs } from 'pinia';
+import { computed, type Ref, ref, watch } from 'vue';
+import { useConfigStore } from './config.store';
+import { shuffle } from '../utils/array';
+import { classSpecRole, classSpecs } from '../data/specs';
+import { useAlertStore } from './alert.store';
+import { v4 as uuidv4 } from 'uuid';
+import { useTeamsStore } from './teams.store';
 
-export const useMembersStore = defineStore("members", () => {
+export const useMembersStore = defineStore('members', () => {
   const configStore = useConfigStore();
   const { region, realm, guild, autoPug } = storeToRefs(configStore);
 
@@ -25,9 +19,9 @@ export const useMembersStore = defineStore("members", () => {
   const teamsStore = useTeamsStore();
   const { teams } = storeToRefs(teamsStore);
 
-  const filter = ref("");
+  const filter = ref('');
   // const rank = ref(6);
-  const role = ref<ClassFilter>("ALL");
+  const role = ref<ClassFilter>('ALL');
 
   // https://raider.io/api#/guild/getApiV1GuildsProfile
   const { isFetching, error, data, statusCode } = useFetch(
@@ -41,7 +35,7 @@ export const useMembersStore = defineStore("members", () => {
         if (!region.value || !realm.value || !guild.value) {
           cancel();
         }
-      },
+      }
     }
   ).json<GuildProfile>();
 
@@ -50,7 +44,7 @@ export const useMembersStore = defineStore("members", () => {
     (code) => {
       if (code === 400) {
         fatal.value =
-          "Could not find requested guild, please double check the guild name, realm and try again.";
+          'Could not find requested guild, please double check the guild name, realm and try again.';
       } else if (/^2/.test(String(code))) {
         fatal.value = undefined;
       }
@@ -63,45 +57,43 @@ export const useMembersStore = defineStore("members", () => {
   );
 
   const pickedMembers = ref<Member[]>([]);
-  const selectedMembers = useSessionStorage<Member[]>("selected", []);
-  const pugs = useSessionStorage<Member[]>("pugs", []);
+  const selectedMembers = useSessionStorage<Member[]>('selected', []);
+  const pugs = useSessionStorage<Member[]>('pugs', []);
 
   const tanks = computed(() =>
     selectedMembers.value.filter((member) => {
-      return member.character.active_spec_role === "TANK";
+      return member.character.active_spec_role === 'TANK';
     })
   );
 
   const damageDealers = computed(() =>
     selectedMembers.value.filter((member) => {
-      return member.character.active_spec_role === "DPS";
+      return member.character.active_spec_role === 'DPS';
     })
   );
 
   const healers = computed(() =>
     selectedMembers.value.filter((member) => {
-      return member.character.active_spec_role === "HEALING";
+      return member.character.active_spec_role === 'HEALING';
     })
   );
 
   const rolesText = computed(() => {
-    let text = "";
+    let text = '';
     if (tanks.value.length) {
-      text += `${tanks.value.length} tank${tanks.value.length > 1 ? "s" : ""}`;
+      text += `${tanks.value.length} tank${tanks.value.length > 1 ? 's' : ''}`;
       if (damageDealers.value.length || healers.value.length) {
-        text += ", ";
+        text += ', ';
       }
     }
     if (damageDealers.value.length) {
       text += `${damageDealers.value.length} dps`;
       if (healers.value.length) {
-        text += ", ";
+        text += ', ';
       }
     }
     if (healers.value.length) {
-      text += `${healers.value.length} healer${
-        healers.value.length > 1 ? "s" : ""
-      }`;
+      text += `${healers.value.length} healer${healers.value.length > 1 ? 's' : ''}`;
     }
     return text;
   });
@@ -112,21 +104,16 @@ export const useMembersStore = defineStore("members", () => {
           .filter((member) => {
             // apply text filter
             const textFilter =
-              filter.value === "" ||
-              [
-                member.character.name,
-                member.character.class,
-                member.character.active_spec_name,
-              ]
-                .join(" ")
+              filter.value === '' ||
+              [member.character.name, member.character.class, member.character.active_spec_name]
+                .join(' ')
                 .toLowerCase()
                 .includes(filter.value.toLowerCase());
             // next.. apply rank filter
             // const rankFilter = member.rank <= rank.value || member.rank === 99;
             // next.. apply role filter
             const roleFilter =
-              role.value === "ALL" ||
-              member.character.active_spec_role === role.value;
+              role.value === 'ALL' || member.character.active_spec_role === role.value;
             // next.. hide deleted characters
             const deletedFilter = member.character.name.search(/-\d+$/) === -1;
             // then.. exclude already selected members
@@ -144,16 +131,11 @@ export const useMembersStore = defineStore("members", () => {
   });
 
   // randomly select a team member
-  function randomMember(
-    members: Ref<Member[]>,
-    filter?: (member: Member) => boolean
-  ) {
+  function randomMember(members: Ref<Member[]>, filter?: (member: Member) => boolean) {
     const unpickedMembers = members.value.filter(
       (member) =>
         // exclude already picked members (by name)
-        !pickedMembers.value.find(
-          (pm) => pm.character.name === member.character.name
-        ) &&
+        !pickedMembers.value.find((pm) => pm.character.name === member.character.name) &&
         // optional additional filter
         (!filter || filter(member))
     );
@@ -204,16 +186,16 @@ export const useMembersStore = defineStore("members", () => {
       classSpecRole[member.character.class][member.character.active_spec_name]!;
   }
 
-  function addPug(role: ClassRole = "DPS") {
+  function addPug(role: ClassRole = 'DPS') {
     const member: Member = {
       rank: 7,
       character: {
         name: uuidv4(),
-        class: "Monk",
-        active_spec_name: "Windwalker",
-        active_spec_role: role,
+        class: 'Monk',
+        active_spec_name: 'Windwalker',
+        active_spec_role: role
       },
-      pug: true,
+      pug: true
     };
     selectedMembers.value.push(member);
     pugs.value.push(member);
@@ -243,19 +225,19 @@ export const useMembersStore = defineStore("members", () => {
       // add tank pugs
       let current = tanks.value.length;
       for (let index = 0; index < amount - current; index++) {
-        addPug("TANK");
+        addPug('TANK');
       }
 
       // add dps pugs
       current = damageDealers.value.length;
       for (let index = 0; index < amount * 3 - current; index++) {
-        addPug("DPS");
+        addPug('DPS');
       }
 
       // add healers
       current = healers.value.length;
       for (let index = 0; index < amount - current; index++) {
-        addPug("HEALING");
+        addPug('HEALING');
       }
     }
 
@@ -276,21 +258,17 @@ export const useMembersStore = defineStore("members", () => {
       // randomly select a tank
       const captain = captains[index];
       const tank =
-        captain && captain.character.active_spec_role === "TANK"
-          ? captain
-          : selectTank();
+        captain && captain.character.active_spec_role === 'TANK' ? captain : selectTank();
       if (!tank) {
         if (!teams.value.length) {
-          error.value = "Not enough tanks";
+          error.value = 'Not enough tanks';
         }
         break;
       }
       pickedMembers.value.push(tank);
       // randomly select damage dealers
       const dps1 =
-        captain && captain.character.active_spec_role === "DPS"
-          ? captain
-          : selectDamageDealer();
+        captain && captain.character.active_spec_role === 'DPS' ? captain : selectDamageDealer();
       if (dps1) {
         pickedMembers.value.push(dps1);
       }
@@ -304,18 +282,16 @@ export const useMembersStore = defineStore("members", () => {
       }
       if (!dps1 || !dps2 || !dps3) {
         if (!teams.value.length) {
-          error.value = "Not enough dps";
+          error.value = 'Not enough dps';
         }
         break;
       }
       // randomly select a healer
       const healer =
-        captain && captain.character.active_spec_role === "HEALING"
-          ? captain
-          : selectHealer();
+        captain && captain.character.active_spec_role === 'HEALING' ? captain : selectHealer();
       if (!healer) {
         if (!teams.value.length) {
-          error.value = "Not enough healers";
+          error.value = 'Not enough healers';
         }
         break;
       }
@@ -324,7 +300,7 @@ export const useMembersStore = defineStore("members", () => {
       }
       const team: Team = {
         id: uuidv4(),
-        members: [tank, dps1, dps2, dps3, healer],
+        members: [tank, dps1, dps2, dps3, healer]
       };
       await teamsStore.add(team);
       // console.log(
@@ -339,7 +315,7 @@ export const useMembersStore = defineStore("members", () => {
     if (amount !== roundedAmount || teams.value.length !== roundedAmount) {
       warning.value = `Too few eligible players to assign all roles ${teams.value.length} teams created, ${playersLeft} players left`;
     } else if (!error.value) {
-      success.value = "Teams successfully randomised";
+      success.value = 'Teams successfully randomised';
     }
   }
 
@@ -348,9 +324,7 @@ export const useMembersStore = defineStore("members", () => {
     // them.. remove picked members
     for (let x = 0; x < team.members.length; x++) {
       const member = team.members[x];
-      const index = pickedMembers.value.findIndex(
-        (pickedMember) => member === pickedMember
-      );
+      const index = pickedMembers.value.findIndex((pickedMember) => member === pickedMember);
       pickedMembers.value.splice(index, 1);
     }
   }
@@ -371,6 +345,6 @@ export const useMembersStore = defineStore("members", () => {
     randomise,
     addPug,
     reset,
-    removeTeam,
+    removeTeam
   };
 });
