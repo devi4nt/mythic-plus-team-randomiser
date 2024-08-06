@@ -23,8 +23,8 @@ defineProps<{
       </span>
     </div>
     <Player
-      v-for="member in members"
-      :key="member.character.name"
+      v-for="(member, index) in members"
+      :key="index"
       :character="member.character"
       :pug="member.pug"
     />

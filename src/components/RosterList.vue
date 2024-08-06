@@ -23,7 +23,6 @@ const {
   // rank,
   filter,
   isFetching,
-  selectedMembers,
   filteredMembers
 } = storeToRefs(members);
 
@@ -44,7 +43,7 @@ function handleTap(event: TouchEvent, member: Member) {
   const tapLength = currentTime - lastTap;
   clearTimeout(tapTimeout);
   if (tapLength < 500 && tapLength > 0) {
-    selectedMembers.value.push(member);
+    members.add(member);
     event.preventDefault();
   } else {
     tapTimeout = setTimeout(() => {
@@ -72,10 +71,10 @@ function handleTap(event: TouchEvent, member: Member) {
     <div class="grid grid-cols-2 md:grid-cols-1 gap-x-4" :class="{ 'opacity-40': isFetching }">
       <div
         class="flex justify-between hover:bg-[#454545] cursor-pointer py-1"
-        v-for="member in filteredMembers"
-        :key="member.character.name"
+        v-for="(member, index) in filteredMembers"
+        :key="index"
         :draggable="true"
-        @dblclick="selectedMembers.push(member)"
+        @dblclick="members.add(member)"
         @touchstart="handleTap($event, member)"
         @dragstart="startDrag($event, member)"
       >

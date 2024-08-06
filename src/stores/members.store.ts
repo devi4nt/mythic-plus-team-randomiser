@@ -14,7 +14,7 @@ export const useMembersStore = defineStore('members', () => {
   const { region, realm, guild, autoPug } = storeToRefs(configStore);
 
   const alertStore = useAlertStore();
-  const { fatal, warning, success } = storeToRefs(alertStore);
+  const { error, fatal, warning, success } = storeToRefs(alertStore);
 
   const teamsStore = useTeamsStore();
   const { teams } = storeToRefs(teamsStore);
@@ -24,7 +24,7 @@ export const useMembersStore = defineStore('members', () => {
   const role = ref<ClassFilter>('ALL');
 
   // https://raider.io/api#/guild/getApiV1GuildsProfile
-  const { isFetching, error, data, statusCode } = useFetch(
+  const { isFetching, data, statusCode } = useFetch(
     () =>
       `https://raider.io/api/v1/guilds/profile?region=${region.value.toLowerCase()}&realm=${
         realm.value
@@ -186,6 +186,10 @@ export const useMembersStore = defineStore('members', () => {
       classSpecRole[member.character.class][member.character.active_spec_name]!;
   }
 
+  function add(member: Member) {
+    selectedMembers.value.push(structuredClone(member));
+  }
+
   function addPug(role: ClassRole = 'DPS') {
     const member: Member = {
       rank: 7,
@@ -197,14 +201,14 @@ export const useMembersStore = defineStore('members', () => {
       },
       pug: true
     };
-    selectedMembers.value.push(member);
     pugs.value.push(member);
+    add(member);
   }
 
   function reset() {
     teamsStore.reset();
     pickedMembers.value.length = 0;
-    error.value = null;
+    error.value = undefined;
     // reset selected members
     selectedMembers.value.length = 0;
   }
@@ -212,7 +216,7 @@ export const useMembersStore = defineStore('members', () => {
   async function randomise() {
     teamsStore.reset();
     pickedMembers.value.length = 0;
-    error.value = null;
+    error.value = undefined;
 
     // auto pug logic
     if (autoPug.value) {
@@ -310,12 +314,14 @@ export const useMembersStore = defineStore('members', () => {
       // );
     }
 
-    const roundedAmount = Math.floor(amount);
-    const playersLeft = selectedMembers.value.length - teams.value.length * 5;
-    if (amount !== roundedAmount || teams.value.length !== roundedAmount) {
-      warning.value = `Too few eligible players to assign all roles ${teams.value.length} teams created, ${playersLeft} players left`;
-    } else if (!error.value) {
-      success.value = 'Teams successfully randomised';
+    if (!error.value) {
+      const roundedAmount = Math.floor(amount);
+      const playersLeft = selectedMembers.value.length - teams.value.length * 5;
+      if (amount !== roundedAmount || teams.value.length !== roundedAmount) {
+        warning.value = `Too few eligible players to assign all roles ${teams.value.length} teams created, ${playersLeft} players left`;
+      } else {
+        success.value = 'Teams successfully randomised';
+      }
     }
   }
 
@@ -338,13 +344,13 @@ export const useMembersStore = defineStore('members', () => {
     filteredMembers,
     isFetching,
     statusCode,
-    error,
     toggleCaptain,
     toggleSpec,
     remove,
     randomise,
     addPug,
     reset,
-    removeTeam
+    removeTeam,
+    add
   };
 });

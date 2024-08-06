@@ -6,6 +6,7 @@ import Btn from './Btn.vue';
 import { storeToRefs } from 'pinia';
 import { useConfigStore } from '../stores/config.store';
 import { useTeamsStore } from '../stores/teams.store';
+import { watch } from 'vue';
 
 defineProps<{
   dragging: boolean;
@@ -22,10 +23,9 @@ const { teams } = storeToRefs(teamsStore);
 
 function onDrop(event: DragEvent) {
   const characterName = event.dataTransfer?.getData('characterName');
-  // console.log("onDrop", event, characterName);
   const member = filteredMembers.value.find((member) => member.character.name === characterName);
   if (member) {
-    selectedMembers.value.push(member);
+    members.add(member);
   } else {
     console.error('member not found', characterName);
   }
@@ -46,11 +46,7 @@ function onDrop(event: DragEvent) {
     >
       Drag &amp; drop players here
     </div>
-    <div
-      class="flex justify-between py-1"
-      v-for="member in selectedMembers"
-      :key="member.character.name"
-    >
+    <div class="flex justify-between py-1" v-for="(member, index) in selectedMembers" :key="index">
       <Player :character="member.character" :pug="member.pug" />
       <div class="flex items-center">
         <span title="Toggle team captain">
