@@ -1,57 +1,57 @@
 export type ClassType =
-  | "Priest"
-  | "Warrior"
-  | "Mage"
-  | "Rogue"
-  | "Hunter"
-  | "Warlock"
-  | "Shaman"
-  | "Druid"
-  | "Paladin"
-  | "Demon Hunter"
-  | "Death Knight"
-  | "Monk"
-  | "Evoker";
+  | 'Priest'
+  | 'Warrior'
+  | 'Mage'
+  | 'Rogue'
+  | 'Hunter'
+  | 'Warlock'
+  | 'Shaman'
+  | 'Druid'
+  | 'Paladin'
+  | 'Demon Hunter'
+  | 'Death Knight'
+  | 'Monk'
+  | 'Evoker';
 
 export type ClassSpec =
-  | "Holy"
-  | "Discipline"
-  | "Shadow"
-  | "Arms"
-  | "Fury"
-  | "Protection"
-  | "Fire"
-  | "Frost"
-  | "Arcane"
-  | "Subtlety"
-  | "Outlaw"
-  | "Assassination"
-  | "Beast Mastery"
-  | "Marksmanship"
-  | "Survival"
-  | "Affliction"
-  | "Demonology"
-  | "Destruction"
-  | "Elemental"
-  | "Enhancement"
-  | "Restoration"
-  | "Balance"
-  | "Feral"
-  | "Guardian"
-  | "Retribution"
-  | "Vengeance"
-  | "Havoc"
-  | "Blood"
-  | "Unholy"
-  | "Windwalker"
-  | "Brewmaster"
-  | "Mistweaver"
-  | "Devastation"
-  | "Preservation"
-  | "Augmentation";
+  | 'Holy'
+  | 'Discipline'
+  | 'Shadow'
+  | 'Arms'
+  | 'Fury'
+  | 'Protection'
+  | 'Fire'
+  | 'Frost'
+  | 'Arcane'
+  | 'Subtlety'
+  | 'Outlaw'
+  | 'Assassination'
+  | 'Beast Mastery'
+  | 'Marksmanship'
+  | 'Survival'
+  | 'Affliction'
+  | 'Demonology'
+  | 'Destruction'
+  | 'Elemental'
+  | 'Enhancement'
+  | 'Restoration'
+  | 'Balance'
+  | 'Feral'
+  | 'Guardian'
+  | 'Retribution'
+  | 'Vengeance'
+  | 'Havoc'
+  | 'Blood'
+  | 'Unholy'
+  | 'Windwalker'
+  | 'Brewmaster'
+  | 'Mistweaver'
+  | 'Devastation'
+  | 'Preservation'
+  | 'Augmentation';
 
-export type ClassRole = "DPS" | "TANK" | "HEALING";
-export type ClassFilter = ClassRole | "ALL";
+export type ClassRole = 'DPS' | 'TANK' | 'HEALING';
+export type ClassFilter = ClassRole | 'ALL';
 
 export interface Character {
   name: string;
@@ -59,12 +59,12 @@ export interface Character {
   class: ClassType;
   active_spec_name: ClassSpec;
   active_spec_role: ClassRole;
-  gender?: "male" | "female";
-  faction?: "horde" | "alliance";
+  gender?: 'male' | 'female';
+  faction?: 'horde' | 'alliance';
   achievement_points?: number;
   honorable_kills?: number;
-  region?: "eu";
-  realm?: "Quel'Thalas" | "Azjol-Nerub";
+  region?: 'eu';
+  realm?: "Quel'Thalas" | 'Azjol-Nerub';
   last_crawled_at?: string;
   profile_url?: string;
   profile_banner?: string;
@@ -93,11 +93,11 @@ export interface Member {
 }
 
 export interface IAlert {
-  type: "error" | "warning" | "success";
+  type: 'error' | 'warning' | 'success';
   message: string;
 }
 
-export type Region = "CN" | "EU" | "KR" | "TW" | "US";
+export type Region = 'CN' | 'EU' | 'KR' | 'TW' | 'US';
 
 export interface IRegion {
   value: Region;

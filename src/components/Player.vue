@@ -1,7 +1,7 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
-import { Character, ClassRole } from "@/types";
-import { computed } from "vue";
+import type { Character, ClassRole } from '../types';
+import { computed } from 'vue';
 
 const props = defineProps<{
   character: Character;
@@ -9,25 +9,20 @@ const props = defineProps<{
 }>();
 
 const safeClass = (name: string) => {
-  return name.toLowerCase().replace(/ /g, "-");
+  return name.toLowerCase().replace(/ /g, '-');
 };
 const specClass = computed(
   () =>
-    "spec_" +
-    safeClass(props.character.class) +
-    "_" +
-    safeClass(props.character.active_spec_name)
+    'spec_' + safeClass(props.character.class) + '_' + safeClass(props.character.active_spec_name)
 );
-const classClass = computed(() => "class_" + safeClass(props.character.class));
+const classClass = computed(() => 'class_' + safeClass(props.character.class));
 
-const textClass = computed(
-  () => "class-color--" + safeClass(props.character.class)
-);
+const textClass = computed(() => 'class-color--' + safeClass(props.character.class));
 
 const roles: Record<ClassRole, string> = {
-  DPS: "Damage dealer",
-  TANK: "Tank",
-  HEALING: "Healer",
+  DPS: 'Damage dealer',
+  TANK: 'Tank',
+  HEALING: 'Healer'
 };
 const roleText = computed(() => roles[props.character.active_spec_role]);
 </script>
@@ -38,10 +33,7 @@ const roleText = computed(() => roles[props.character.active_spec_role]);
       <div :class="classClass" :title="pug ? 'Pug' : character.class"></div>
     </div>
     <div class="w-[22px] scaler mr-2">
-      <div
-        :class="specClass"
-        :title="pug ? 'Pug' : character.active_spec_name"
-      ></div>
+      <div :class="specClass" :title="pug ? 'Pug' : character.active_spec_name"></div>
     </div>
     <div class="font-bold" :class="pug ? 'text-gray-400' : textClass">
       {{ pug ? roleText : character.name }}

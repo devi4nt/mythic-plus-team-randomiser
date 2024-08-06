@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import Btn from "./Btn.vue";
+import { ref } from 'vue';
+import Btn from './Btn.vue';
 
 const emit = defineEmits<{
-  (event: "update", rank: number): void;
+  (event: 'update', rank: number): void;
 }>();
 
 defineProps<{
@@ -11,7 +11,7 @@ defineProps<{
 }>();
 
 const ranks = ref([1, 2, 3, 4, 5, 6]);
-const titles = ref(["R1", "R2", "R3", "R4", "R5", "R6", "R6"]);
+const titles = ref(['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R6']);
 </script>
 
 <template>

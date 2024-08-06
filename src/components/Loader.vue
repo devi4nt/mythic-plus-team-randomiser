@@ -31,7 +31,7 @@
 
 .loader:before,
 .loader:after {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
 }
