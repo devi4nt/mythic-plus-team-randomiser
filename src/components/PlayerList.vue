@@ -6,7 +6,6 @@ import Btn from './Btn.vue';
 import { storeToRefs } from 'pinia';
 import { useConfigStore } from '../stores/config.store';
 import { useTeamsStore } from '../stores/teams.store';
-import { watch } from 'vue';
 
 defineProps<{
   dragging: boolean;

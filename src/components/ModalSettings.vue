@@ -120,7 +120,9 @@ function update() {
       <div class="flex justify-between mt-4">
         <div class="text-left text-gray-400 text-sm">
           <a
-            href="mailto:mythic+randomiser@merry.earth?subject=I%20can&#39;t%20find%20my%20region%20or%20realm"
+            href="https://github.com/devi4nt/mythic-plus-team-randomiser/issues"
+            target="_blank"
+            rel="noreferrer"
             class="text-raiderio underline"
             >Can't find your region or realm?</a
           >

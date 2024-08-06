@@ -23,12 +23,21 @@ const emit = defineEmits(['close']);
       <div class="flex flex-col gap-4 mt-4 text-left text-gray-400 text-sm">
         <div>
           This started life as a tool I made for my guild. I figured it could be useful to the wider
-          community. If you find any bugs or have any suggestions, please
+          community. If you find any bugs please
           <a
-            href="mailto:mythic+randomiser@merry.earth?subject=Suggestions"
+            href="https://github.com/devi4nt/mythic-plus-team-randomiser/issues"
             class="text-raiderio underline"
-            >let me know.</a
-          >
+            target="_blank"
+            rel="noreferrer"
+            >raise an issue</a
+          >. If you have any ideas or suggestions feel free to
+          <a
+            href="https://github.com/devi4nt/mythic-plus-team-randomiser/discussions"
+            class="text-raiderio underline"
+            target="_blank"
+            rel="noreferrer"
+            >start a discussion</a
+          >.
         </div>
         <div>
           If you like this tool, please consider
