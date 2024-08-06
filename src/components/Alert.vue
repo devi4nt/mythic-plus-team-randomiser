@@ -1,6 +1,7 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
 import { ExclamationTriangleIcon } from '@heroicons/vue/20/solid';
+import { useTimeoutFn } from '@vueuse/core';
 import { computed, onMounted, ref } from 'vue';
 
 const props = defineProps<{
@@ -39,7 +40,7 @@ const colours = computed(() => {
 
 onMounted(() => {
   if (props.timeout) {
-    setTimeout(() => {
+    useTimeoutFn(() => {
       visible.value = false;
     }, props.timeout);
   }

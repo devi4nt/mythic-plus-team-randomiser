@@ -57,7 +57,7 @@ function handleTap(event: TouchEvent, member: Member) {
 <template>
   <div class="flex flex-col order-3 md:order-1 gap-2">
     <div class="flex justify-between">
-      <div class="font-bold text-gray-400">Roster</div>
+      <div class="font-bold text-gray-400">Guild Roster</div>
       <Loader v-if="isFetching" />
     </div>
     <input

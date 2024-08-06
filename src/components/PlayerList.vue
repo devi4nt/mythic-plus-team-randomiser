@@ -3,13 +3,17 @@ import { StarIcon, ArrowPathRoundedSquareIcon, XMarkIcon } from '@heroicons/vue/
 import { useMembersStore } from '../stores/members.store';
 import Player from './Player.vue';
 import Btn from './Btn.vue';
+import ModalAddPlayer from './ModalAddPlayer.vue';
 import { storeToRefs } from 'pinia';
 import { useConfigStore } from '../stores/config.store';
 import { useTeamsStore } from '../stores/teams.store';
+import { ref } from 'vue';
 
 defineProps<{
   dragging: boolean;
 }>();
+
+const showAddPlayer = ref(false);
 
 const configStore = useConfigStore();
 const { autoPug, minPlayers } = storeToRefs(configStore);
@@ -38,7 +42,10 @@ function onDrop(event: DragEvent) {
     @dragover.prevent
     @dragenter.prevent
   >
-    <div class="font-bold text-gray-400">Players</div>
+    <div class="flex justify-between">
+      <div class="font-bold text-gray-400">Players</div>
+      <Btn @click="showAddPlayer = true" class="font-bold hidden md:block"> ADD </Btn>
+    </div>
     <div
       class="border border-dashed rounded-md h-[94px] w-full md:w-64 my-2 flex items-center justify-center text-sm font-bold transition-colors"
       :class="[dragging ? 'border-green-600 text-green-600' : 'border-gray-400 text-gray-400']"
@@ -86,6 +93,7 @@ function onDrop(event: DragEvent) {
         PICK TEAMS
       </Btn>
       <div class="flex gap-2">
+        <Btn @click="showAddPlayer = true" class="font-bold block md:hidden"> ADD </Btn>
         <Btn v-if="!autoPug" @click="members.addPug()" class="font-bold"> PUG </Btn>
         <Btn
           :disabled="!selectedMembers.length && !teams.length"
@@ -96,6 +104,16 @@ function onDrop(event: DragEvent) {
         </Btn>
       </div>
     </div>
+    <ModalAddPlayer
+      :show="showAddPlayer"
+      @close="showAddPlayer = false"
+      @add="
+        members.add({
+          rank: 7,
+          character: $event
+        })
+      "
+    />
   </div>
 </template>
 
