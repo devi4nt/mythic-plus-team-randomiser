@@ -4,11 +4,28 @@ import type { Member } from '../types';
 import Player from './Player.vue';
 import { XMarkIcon } from '@heroicons/vue/20/solid';
 
-const emit = defineEmits(['remove']);
+const emit = defineEmits<{
+  (event: 'remove'): void;
+  (event: 'swap', swapName?: string, target?: Member): void;
+}>();
+
 defineProps<{
   index: number;
   members: Member[];
+  swappable?: boolean;
 }>();
+
+function startDrag(event: DragEvent, member: Member) {
+  if (event.dataTransfer) {
+    event.dataTransfer.dropEffect = 'move';
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('characterName', member.character.name);
+  }
+}
+
+function onDrop(event: DragEvent, target: Member) {
+  emit('swap', event.dataTransfer?.getData('characterName'), target);
+}
 </script>
 
 <template>
@@ -27,6 +44,11 @@ defineProps<{
       :key="index"
       :character="member.character"
       :pug="member.pug"
+      :draggable="swappable"
+      @dragstart="startDrag($event, member)"
+      @drop="onDrop($event, member)"
+      @dragover.prevent
+      @dragenter.prevent
     />
   </div>
 </template>
