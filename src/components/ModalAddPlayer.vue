@@ -7,7 +7,7 @@ import Alert from './Alert.vue';
 import { XMarkIcon } from '@heroicons/vue/20/solid';
 import { regions, realms } from '../data/realms';
 import type { Character, Region } from '../types';
-import { useFetch, useSessionStorage } from '@vueuse/core';
+import { useFetch, useSessionStorage, onKeyStroke } from '@vueuse/core';
 
 const emit = defineEmits<{
   (event: 'close'): void;
@@ -53,18 +53,14 @@ async function add() {
   }
 }
 
-const onKeyDown = (event: KeyboardEvent) => {
-  if (event.key === 'Enter') {
-    event.preventDefault();
-    add();
-  }
-};
-
 const close = () => {
   error.value = '';
   character.value = '';
   emit('close');
 };
+
+const trigger = ref<HTMLInputElement>();
+onKeyStroke('Enter', add, { target: trigger });
 </script>
 
 <template>
@@ -112,10 +108,10 @@ const close = () => {
         <div class="flex items-center gap-2">
           <div class="md:w-64 w-full text-left text-gray-400">Character</div>
           <input
+            ref="trigger"
             v-model="character"
             class="text-gray-400 border rounded-md border-gray-400 bg-[#353535] px-2 py-1 w-full"
             placeholder="Enter the character name"
-            @keydown="onKeyDown"
           />
         </div>
       </div>

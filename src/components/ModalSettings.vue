@@ -5,6 +5,7 @@ import Btn from './Btn.vue';
 import { XMarkIcon } from '@heroicons/vue/20/solid';
 import { regions, realms } from '../data/realms';
 import type { Region } from '../types';
+import { onKeyStroke } from '@vueuse/core';
 
 const emit = defineEmits<{
   (event: 'close'): void;
@@ -52,6 +53,9 @@ function update() {
   });
   emit('close');
 }
+
+const trigger = ref<HTMLInputElement>();
+onKeyStroke('Enter', update, { target: trigger });
 </script>
 
 <template>
@@ -69,7 +73,7 @@ function update() {
       </div>
       <div class="flex flex-col gap-2 mt-4">
         <div class="text-left text-gray-400 text-sm font-bold">
-          Select region, realm & enter your guilds name
+          Select region, realm & enter guilds name
         </div>
         <div class="flex items-center gap-2">
           <div class="md:w-64 w-full text-left text-gray-400">Region</div>
@@ -98,6 +102,7 @@ function update() {
         <div class="flex items-center gap-2">
           <div class="md:w-64 w-full text-left text-gray-400">Guild</div>
           <input
+            ref="trigger"
             v-model="guildName"
             class="text-gray-400 border rounded-md border-gray-400 bg-[#353535] px-2 py-1 w-full"
             placeholder="Enter your guild name"
