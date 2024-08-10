@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ShareIcon } from '@heroicons/vue/20/solid';
 import PlayerTeam from './PlayerTeam.vue';
 import Btn from './Btn.vue';
 import { useMembersStore } from '../stores/members.store';
@@ -90,7 +91,9 @@ function share() {
         />
       </div>
     </div>
-    <Btn @click="share" class="mt-2">SHARE TEAMS</Btn>
+    <Btn @click="share" class="mt-2" title="Copy share link">
+      <ShareIcon class="w-3 h-3" />SHARE TEAMS
+    </Btn>
   </div>
 </template>
 

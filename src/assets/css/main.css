@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  background-color: hsl(0, 0%, 21%);
+  background-color: #353535;
 }
 
 /* start spec specific */

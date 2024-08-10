@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { BoltIcon } from '@heroicons/vue/20/solid';
 import type { Member, Team } from '../types';
 import Btn from './Btn.vue';
 
@@ -14,13 +15,6 @@ defineProps<{
 
 <template>
   <div class="flex justify-between gap-2 my-2">
-    <Btn
-      :disabled="selectedMembers.length < minPlayers"
-      @click="$emit('randomise')"
-      class="font-bold"
-    >
-      PICK TEAMS
-    </Btn>
     <div class="flex gap-2">
       <Btn v-if="!autoPug" @click="emit('addPug')" class="font-bold block md:hidden"> ADD PUG </Btn>
       <Btn @click="emit('add')" class="font-bold block md:hidden"> ADD </Btn>
@@ -32,6 +26,14 @@ defineProps<{
         RESET
       </Btn>
     </div>
+    <Btn
+      :disabled="selectedMembers.length < minPlayers"
+      :type="selectedMembers.length < minPlayers ? 'default' : 'success'"
+      @click="$emit('randomise')"
+      class="font-bold"
+    >
+      <BoltIcon class="w-3 h-3" /> PICK TEAMS
+    </Btn>
   </div>
 </template>
 

@@ -93,22 +93,26 @@ onMounted(() => {
       ><RaiderIO title="powered by" class="fixed bottom-1.5 right-1.5 h-6 z-10"
     /></a>
     <div class="flex items-center gap-2 absolute top-2 right-2">
-      <QuestionMarkCircleIcon
-        @click="showInfo = !showInfo"
-        class="h-5 cursor-pointer"
-        :class="{
-          'text-gray-400 hover:text-gray-300': !showInfo,
-          'text-raiderio': showInfo
-        }"
-      />
-      <Cog6ToothIcon
-        @click="showSettings = !showSettings"
-        class="h-5 cursor-pointer"
-        :class="{
-          'text-gray-400 hover:text-gray-300': !showSettings,
-          'text-raiderio': showSettings
-        }"
-      />
+      <div title="About this app">
+        <QuestionMarkCircleIcon
+          @click="showInfo = !showInfo"
+          class="w-5 h-5 md:w-6 md:h-6 cursor-pointer"
+          :class="{
+            'text-gray-400 hover:text-gray-300': !showInfo,
+            'text-raiderio': showInfo
+          }"
+        />
+      </div>
+      <div title="Settings">
+        <Cog6ToothIcon
+          @click="showSettings = !showSettings"
+          class="w-5 h-5 md:w-6 md:h-6 cursor-pointer"
+          :class="{
+            'text-gray-400 hover:text-gray-300': !showSettings,
+            'text-raiderio': showSettings
+          }"
+        />
+      </div>
     </div>
     <div class="flex flex-col w-full pb-10 p-2">
       <div class="flex flex-col md:flex-row justify-start gap-4 w-full bg-[#353535]">
