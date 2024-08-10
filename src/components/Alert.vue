@@ -4,14 +4,17 @@ import { ExclamationTriangleIcon } from '@heroicons/vue/20/solid';
 import { useTimeoutFn } from '@vueuse/core';
 import { computed, onMounted, ref } from 'vue';
 
+type AlertType = 'info' | 'error' | 'warning' | 'success';
+type AlertClasses = Record<'bg' | 'icon' | 'body', string>;
+
 const props = defineProps<{
-  type: 'error' | 'warning' | 'success';
+  type: AlertType;
   timeout?: number;
   fixed?: boolean;
 }>();
 
 const visible = ref(true);
-const classes = ref({
+const classes = ref<Record<AlertType, AlertClasses>>({
   info: {
     bg: 'bg-blue-600',
     icon: 'text-blue-100',
@@ -34,7 +37,7 @@ const classes = ref({
   }
 });
 
-const colours = computed(() => {
+const colours = computed<AlertClasses>(() => {
   return classes.value[props.type];
 });
 
@@ -50,9 +53,13 @@ onMounted(() => {
 <template>
   <div
     class="transition-opacity ease-in-out duration-500"
-    :class="[visible ? 'opacity-100' : 'opacity-0', fixed ? 'fixed bottom-0 w-full z-10' : '']"
+    :class="[
+      visible ? 'opacity-100' : 'opacity-0',
+      fixed ? 'fixed bottom-0 w-full z-10' : '',
+      colours.bg
+    ]"
   >
-    <div class="p-2" :class="colours.bg">
+    <div class="p-2">
       <div class="flex">
         <div class="flex-shrink-0">
           <ExclamationTriangleIcon class="h-5 w-5" :class="colours.icon" aria-hidden="true" />

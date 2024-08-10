@@ -3,7 +3,7 @@ import PlayerTeam from './PlayerTeam.vue';
 import { useMembersStore } from '../stores/members.store';
 import { useTeamsStore } from '../stores/teams.store';
 import { storeToRefs } from 'pinia';
-import type { Member } from 'src/types';
+import type { Member } from '../types';
 
 const members = useMembersStore();
 const teamsStore = useTeamsStore();

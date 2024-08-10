@@ -1,4 +1,4 @@
-import type { GuildProfile } from 'src/types';
+import type { GuildProfile } from '../../types';
 
 export const mockGuildProfile: GuildProfile = {
   name: 'Blank Slate',

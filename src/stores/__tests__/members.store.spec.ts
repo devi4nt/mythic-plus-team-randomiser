@@ -5,8 +5,8 @@ import { useMembersStore } from '../members.store';
 import { useConfigStore } from '../config.store';
 import { useTeamsStore } from '../teams.store';
 import { nextTick, ref, type Ref } from 'vue';
-import type { GuildProfile, Member } from 'src/types';
-import { mockGuildProfile } from './mock-guild-profile';
+import type { GuildProfile, Member } from '../../types';
+import { mockGuildProfile } from '../../data/__mocks__/mock-guild-profile';
 import { useAlertStore } from '../alert.store';
 
 vi.mock('@vueuse/core', async (original) => {

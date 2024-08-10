@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
 import type { Member } from '../types';
 import Player from './Player.vue';
