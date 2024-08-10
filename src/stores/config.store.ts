@@ -10,6 +10,7 @@ export const useConfigStore = defineStore('config', () => {
   const guild = useLocalStorage<string>('guild', '');
   const fancy = useLocalStorage<boolean>('fancy', true);
   const autoPug = useLocalStorage<boolean>('autoPug', false);
+  const spreadLust = useLocalStorage<boolean>('spreadLust', true);
 
   return {
     region,
@@ -17,6 +18,7 @@ export const useConfigStore = defineStore('config', () => {
     guild,
     fancy,
     autoPug,
+    spreadLust,
     minPlayers
   };
 });

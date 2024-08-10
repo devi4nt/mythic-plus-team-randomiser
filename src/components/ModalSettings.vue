@@ -4,38 +4,24 @@ import Modal from './Modal.vue';
 import Btn from './Btn.vue';
 import { XMarkIcon } from '@heroicons/vue/20/solid';
 import { regions, realms } from '../data/realms';
-import type { Region } from '../types';
 import { onKeyStroke } from '@vueuse/core';
+import { useConfigStore } from '../stores/config.store';
 
-const emit = defineEmits<{
-  (event: 'close'): void;
-  (
-    event: 'update',
-    data: {
-      region: Region;
-      realm: string;
-      guild: string;
-      autoPug: boolean;
-      fancy: boolean;
-    }
-  ): void;
-}>();
+const emit = defineEmits(['close']);
 
-const props = defineProps<{
+defineProps<{
   show: boolean;
-  region: Region;
-  realm: string;
-  guild: string;
-  autoPug: boolean;
-  fancy: boolean;
   preventClose?: boolean;
 }>();
 
-const regionName = ref(props.region);
-const realmName = ref(props.realm);
-const guildName = ref(props.guild);
-const autoPug = ref(props.autoPug);
-const fancy = ref(props.fancy);
+const store = useConfigStore();
+
+const regionName = ref(store.region);
+const realmName = ref(store.realm);
+const guildName = ref(store.guild);
+const autoPug = ref(store.autoPug);
+const spreadLust = ref(store.spreadLust);
+const fancy = ref(store.fancy);
 
 const regionsSorted = computed(() => regions.sort((a, b) => a.label.localeCompare(b.label)));
 
@@ -44,13 +30,12 @@ const regionRealms = computed(() =>
 );
 
 function update() {
-  emit('update', {
-    region: regionName.value,
-    realm: realmName.value,
-    guild: guildName.value,
-    autoPug: autoPug.value,
-    fancy: fancy.value
-  });
+  store.region = regionName.value;
+  store.realm = realmName.value;
+  store.guild = guildName.value;
+  store.autoPug = autoPug.value;
+  store.spreadLust = spreadLust.value;
+  store.fancy = fancy.value;
   emit('close');
 }
 
@@ -116,6 +101,12 @@ onKeyStroke('Enter', update, { target: trigger });
             Automatically add pugs if there aren't enough real players
           </div>
           <input v-model="autoPug" type="checkbox" />
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-full text-left text-gray-400">
+            Try to ensure each team has at least one lust
+          </div>
+          <input v-model="spreadLust" type="checkbox" />
         </div>
         <div class="flex items-center gap-2">
           <div class="w-full text-left text-gray-400">Animated team reveal</div>

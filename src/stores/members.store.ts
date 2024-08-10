@@ -1,17 +1,17 @@
 import type { ClassFilter, ClassRole, GuildProfile, Member, Team } from '../types';
 import { useFetch, useSessionStorage } from '@vueuse/core';
 import { defineStore, storeToRefs } from 'pinia';
-import { computed, type Ref, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useConfigStore } from './config.store';
 import { shuffle } from '../utils/array';
-import { classSpecRole, classSpecs } from '../data/specs';
+import { classSpecLust, classSpecRole, classSpecs } from '../data/specs';
 import { useAlertStore } from './alert.store';
 import { v4 as uuidv4 } from 'uuid';
 import { useTeamsStore } from './teams.store';
 
 export const useMembersStore = defineStore('members', () => {
   const configStore = useConfigStore();
-  const { region, realm, guild, autoPug } = storeToRefs(configStore);
+  const { region, realm, guild, autoPug, spreadLust } = storeToRefs(configStore);
 
   const alertStore = useAlertStore();
   const { error, fatal, warning, success } = storeToRefs(alertStore);
@@ -130,38 +130,6 @@ export const useMembersStore = defineStore('members', () => {
       : [];
   });
 
-  // randomly select a team member
-  function randomMember(members: Ref<Member[]>, filter?: (member: Member) => boolean) {
-    const unpickedMembers = members.value.filter(
-      (member) =>
-        // exclude already picked members (by name)
-        !pickedMembers.value.find((pm) => pm.character.name === member.character.name) &&
-        // optional additional filter
-        (!filter || filter(member))
-    );
-    shuffle(unpickedMembers);
-    return unpickedMembers[Math.floor(Math.random() * unpickedMembers.length)];
-  }
-
-  function selectCaptain() {
-    return randomMember(
-      ref([...tanks.value, ...damageDealers.value, ...healers.value]),
-      (member: Member) => !!member.captain
-    );
-  }
-
-  function selectTank() {
-    return randomMember(tanks);
-  }
-
-  function selectDamageDealer() {
-    return randomMember(damageDealers);
-  }
-
-  function selectHealer() {
-    return randomMember(healers);
-  }
-
   function remove(removeMember: Member) {
     selectedMembers.value = selectedMembers.value.filter((member) => {
       return member !== removeMember;
@@ -224,7 +192,10 @@ export const useMembersStore = defineStore('members', () => {
       const currentPugs = selectedMembers.value.filter((member) => member.pug);
       currentPugs.forEach((member) => remove(member));
 
-      const amount = Math.ceil(selectedMembers.value.length / 5);
+      let amount = tanks.value.length;
+      if (Math.ceil(damageDealers.value.length / 3) > amount)
+        amount = Math.ceil(damageDealers.value.length / 3);
+      if (healers.value.length > amount) amount = healers.value.length;
 
       // add tank pugs
       let current = tanks.value.length;
@@ -246,72 +217,112 @@ export const useMembersStore = defineStore('members', () => {
     }
 
     const amount = Math.ceil(selectedMembers.value.length / 5);
+    // console.log(`randomising ${amount} teams`);
 
-    // select captains
-    const captains = [];
-    for (let index = 0; index < amount; index++) {
-      const captain = selectCaptain();
-      if (captain) {
-        pickedMembers.value.push(captain);
-        captains.push(captain);
+    // lust allocation logic
+    const lusts: (Member | undefined)[] = [];
+    if (spreadLust.value) {
+      // when the captain overlaps with a lust, fill in a blank
+      selectedMembers.value
+        .filter((member) => member.captain && classSpecLust[member.character.class])
+        .forEach(() => {
+          lusts.push(undefined);
+        });
+      const nonCaptainsWithLust = selectedMembers.value.filter(
+        (member) => !member.captain && classSpecLust[member.character.class]
+      );
+      shuffle(nonCaptainsWithLust);
+      for (const member of nonCaptainsWithLust) {
+        if (lusts.length < amount) {
+          pickedMembers.value.push(member);
+          lusts.push(member);
+        }
       }
     }
-    // console.log(`picking ${amount} teams`);
+
+    // captain allocation logic
+    const captains = selectedMembers.value.filter((member) => member.captain);
+    if (captains.length > amount) {
+      error.value = 'Too many team captains';
+      return;
+    } else {
+      pickedMembers.value.push(...captains);
+    }
+
     for (let index = 0; index < amount; index++) {
       // console.log(`picking team: ${index + 1}`);
-      // randomly select a tank
-      const captain = captains[index];
+      const members: Member[] = [];
+      const eligibleMembers = selectedMembers.value.filter(
+        (member) =>
+          // exclude already picked members (by name)
+          !pickedMembers.value.find((m) => m.character.name === member.character.name)
+      );
+      shuffle(eligibleMembers); // shuffle eligible members
+
+      const captain = captains.shift();
+
+      const lust = lusts.shift();
+      if (lust) {
+        eligibleMembers.unshift(lust);
+      }
+
       const tank =
-        captain && captain.character.active_spec_role === 'TANK' ? captain : selectTank();
+        captain?.character.active_spec_role === 'TANK'
+          ? captain
+          : eligibleMembers.find((member) => member.character.active_spec_role === 'TANK');
       if (!tank) {
         if (!teams.value.length) {
           error.value = 'Not enough tanks';
         }
         break;
       }
-      pickedMembers.value.push(tank);
-      // randomly select damage dealers
-      const dps1 =
-        captain && captain.character.active_spec_role === 'DPS' ? captain : selectDamageDealer();
-      if (dps1) {
-        pickedMembers.value.push(dps1);
+      members.push(tank);
+
+      const dps: Member[] = [];
+      if (captain?.character.active_spec_role === 'DPS') {
+        dps.push(captain);
       }
-      const dps2 = selectDamageDealer();
-      if (dps2) {
-        pickedMembers.value.push(dps2);
+      for (const member of eligibleMembers) {
+        if (member.character.active_spec_role === 'DPS') {
+          dps.push(member);
+        }
+        if (dps.length === 3) {
+          break;
+        }
       }
-      const dps3 = selectDamageDealer();
-      if (dps3) {
-        pickedMembers.value.push(dps3);
-      }
-      if (!dps1 || !dps2 || !dps3) {
+      if (dps.length < 3) {
         if (!teams.value.length) {
           error.value = 'Not enough dps';
         }
         break;
       }
-      // randomly select a healer
+      members.push(...dps);
+
       const healer =
-        captain && captain.character.active_spec_role === 'HEALING' ? captain : selectHealer();
+        captain?.character.active_spec_role === 'HEALING'
+          ? captain
+          : eligibleMembers.find((member) => member.character.active_spec_role === 'HEALING');
       if (!healer) {
         if (!teams.value.length) {
           error.value = 'Not enough healers';
         }
         break;
       }
-      if (healer) {
-        pickedMembers.value.push(healer);
-      }
+      members.push(healer);
+
+      pickedMembers.value.push(...members);
+      // console.log(
+      //   `team names: ${members
+      //     .map((member) => member.character.name)
+      //     .join(
+      //       ', '
+      //     )} roles: ${members.map((member) => member.character.active_spec_role).join(', ')}`
+      // );
       const team: Team = {
         id: uuidv4(),
-        members: [tank, dps1, dps2, dps3, healer]
+        members
       };
       await teamsStore.add(team);
-      // console.log(
-      //   `team members: ${team.members
-      //     .map((member) => member.character.name)
-      //     .join(", ")}`
-      // );
     }
 
     if (!error.value) {

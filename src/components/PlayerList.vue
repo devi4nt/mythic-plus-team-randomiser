@@ -4,6 +4,7 @@ import { useMembersStore } from '../stores/members.store';
 import Player from './Player.vue';
 import Btn from './Btn.vue';
 import ModalAddPlayer from './ModalAddPlayer.vue';
+import PlayerListButtons from './PlayerListButtons.vue';
 import { storeToRefs } from 'pinia';
 import { useConfigStore } from '../stores/config.store';
 import { useTeamsStore } from '../stores/teams.store';
@@ -52,6 +53,17 @@ function onDrop(event: DragEvent) {
     >
       Drag &amp; drop players here
     </div>
+    <PlayerListButtons
+      v-if="selectedMembers.length > 10"
+      @add="showAddPlayer = true"
+      @randomise="members.randomise()"
+      @add-pug="members.addPug()"
+      @reset="members.reset()"
+      :auto-pug="autoPug"
+      :selected-members="selectedMembers"
+      :min-players="minPlayers"
+      :teams="teams"
+    />
     <div class="flex justify-between py-1" v-for="(member, index) in selectedMembers" :key="index">
       <Player :character="member.character" :pug="member.pug" />
       <div class="flex items-center">
@@ -84,26 +96,16 @@ function onDrop(event: DragEvent) {
         {{ rolesText }}
       </div>
     </div>
-    <div class="flex justify-between gap-2 mt-2">
-      <Btn
-        :disabled="selectedMembers.length < minPlayers"
-        @click="members.randomise()"
-        class="font-bold"
-      >
-        PICK TEAMS
-      </Btn>
-      <div class="flex gap-2">
-        <Btn @click="showAddPlayer = true" class="font-bold block md:hidden"> ADD </Btn>
-        <Btn v-if="!autoPug" @click="members.addPug()" class="font-bold"> PUG </Btn>
-        <Btn
-          :disabled="!selectedMembers.length && !teams.length"
-          @click="members.reset()"
-          class="font-bold"
-        >
-          RESET
-        </Btn>
-      </div>
-    </div>
+    <PlayerListButtons
+      @add="showAddPlayer = true"
+      @randomise="members.randomise()"
+      @add-pug="members.addPug()"
+      @reset="members.reset()"
+      :auto-pug="autoPug"
+      :selected-members="selectedMembers"
+      :min-players="minPlayers"
+      :teams="teams"
+    />
     <ModalAddPlayer
       :show="showAddPlayer"
       @close="showAddPlayer = false"

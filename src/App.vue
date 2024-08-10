@@ -39,16 +39,6 @@ const { alert, fatal } = storeToRefs(alertStore);
       :show="showSettings || !region || !realm || !guild"
       :prevent-close="!region || !realm || !guild"
       @close="showSettings = false"
-      :region="region"
-      :realm="realm"
-      :guild="guild"
-      :auto-pug="autoPug"
-      :fancy="fancy"
-      @update="
-        (data: any) => {
-          ({ region, realm, guild, autoPug, fancy } = data);
-        }
-      "
     />
     <TeamReveal v-if="showTeam" :team="showTeam" :number="teams.length + 1" />
     <Alert v-if="fatal" type="error" :fixed="true">
