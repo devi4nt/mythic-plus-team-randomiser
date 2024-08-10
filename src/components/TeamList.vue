@@ -19,7 +19,10 @@ function swap(swapName?: string, destination?: Member) {
 </script>
 
 <template>
-  <div v-if="teams.length" class="flex flex-wrap h-max order-2 md:order-3 gap-2 gap-x-4 mt-8">
+  <div
+    v-if="teams.length"
+    class="flex flex-wrap h-max order-2 md:order-3 gap-2 gap-x-4 mt-0 md:mt-8"
+  >
     <div class="flex flex-col gap-2" v-for="(team, index) in teams" :key="team.id">
       <PlayerTeam
         :members="team.members"

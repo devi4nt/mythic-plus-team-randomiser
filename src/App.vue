@@ -20,7 +20,7 @@ const showSettings = ref(false);
 const dragging = ref(false);
 
 const configStore = useConfigStore();
-const { region, realm, guild, fancy, autoPug, minPlayers } = storeToRefs(configStore);
+const { region, realm, guild, minPlayers } = storeToRefs(configStore);
 
 const members = useMembersStore();
 const { selectedMembers } = storeToRefs(members);
