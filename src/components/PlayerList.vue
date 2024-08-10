@@ -45,7 +45,12 @@ function onDrop(event: DragEvent) {
   >
     <div class="flex justify-between">
       <div class="font-bold text-gray-400">Players</div>
-      <Btn @click="showAddPlayer = true" class="font-bold hidden md:block"> ADD </Btn>
+      <div class="flex gap-2">
+        <Btn v-if="!autoPug" @click="members.addPug()" class="font-bold hidden md:block">
+          ADD PUG
+        </Btn>
+        <Btn @click="showAddPlayer = true" class="font-bold hidden md:block"> ADD </Btn>
+      </div>
     </div>
     <div
       class="border border-dashed rounded-md h-[94px] w-full md:w-64 my-2 flex items-center justify-center text-sm font-bold transition-colors"

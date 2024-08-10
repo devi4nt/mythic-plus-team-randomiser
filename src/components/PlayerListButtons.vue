@@ -22,8 +22,8 @@ defineProps<{
       PICK TEAMS
     </Btn>
     <div class="flex gap-2">
+      <Btn v-if="!autoPug" @click="emit('addPug')" class="font-bold block md:hidden"> ADD PUG </Btn>
       <Btn @click="emit('add')" class="font-bold block md:hidden"> ADD </Btn>
-      <Btn v-if="!autoPug" @click="emit('addPug')" class="font-bold"> PUG </Btn>
       <Btn
         :disabled="!selectedMembers.length && !teams.length"
         @click="emit('reset')"

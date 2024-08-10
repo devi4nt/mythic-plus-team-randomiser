@@ -99,3 +99,14 @@ export interface IRealm {
   value: string;
   label: string;
 }
+
+export interface IShareData {
+  config: {
+    version: number;
+    region: Region;
+    realm: string;
+    guild: string;
+  };
+  teams: Team[];
+  unselected: Member[];
+}
