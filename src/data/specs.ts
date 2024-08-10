@@ -83,3 +83,10 @@ export const classSpecRole: Record<ClassType, Partial<Record<ClassSpec, ClassRol
     Augmentation: 'DPS'
   }
 };
+
+export const classSpecLust: Partial<Record<ClassType, boolean>> = {
+  Mage: true,
+  Hunter: true,
+  Shaman: true,
+  Evoker: true
+};

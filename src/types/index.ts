@@ -13,42 +13,34 @@ export type ClassType =
   | 'Monk'
   | 'Evoker';
 
+export type PriestClassSpec = 'Holy' | 'Discipline' | 'Shadow';
+export type WarriorClassSpec = 'Arms' | 'Fury' | 'Protection';
+export type MageClassSpec = 'Fire' | 'Frost' | 'Arcane';
+export type RogueClassSpec = 'Subtlety' | 'Outlaw' | 'Assassination';
+export type HunterClassSpec = 'Beast Mastery' | 'Marksmanship' | 'Survival';
+export type WarlockClassSpec = 'Affliction' | 'Demonology' | 'Destruction';
+export type ShamanClassSpec = 'Elemental' | 'Enhancement' | 'Restoration';
+export type DruidClassSpec = 'Restoration' | 'Balance' | 'Feral' | 'Guardian';
+export type PaladinClassSpec = 'Protection' | 'Retribution' | 'Holy';
+export type DemonHunterClassSpec = 'Vengeance' | 'Havoc';
+export type DeathKnightClassSpec = 'Blood' | 'Unholy' | 'Frost';
+export type MonkClassSpec = 'Windwalker' | 'Brewmaster' | 'Mistweaver';
+export type EvokerClassSpec = 'Devastation' | 'Preservation' | 'Augmentation';
+
 export type ClassSpec =
-  | 'Holy'
-  | 'Discipline'
-  | 'Shadow'
-  | 'Arms'
-  | 'Fury'
-  | 'Protection'
-  | 'Fire'
-  | 'Frost'
-  | 'Arcane'
-  | 'Subtlety'
-  | 'Outlaw'
-  | 'Assassination'
-  | 'Beast Mastery'
-  | 'Marksmanship'
-  | 'Survival'
-  | 'Affliction'
-  | 'Demonology'
-  | 'Destruction'
-  | 'Elemental'
-  | 'Enhancement'
-  | 'Restoration'
-  | 'Balance'
-  | 'Feral'
-  | 'Guardian'
-  | 'Retribution'
-  | 'Vengeance'
-  | 'Havoc'
-  | 'Blood'
-  | 'Unholy'
-  | 'Windwalker'
-  | 'Brewmaster'
-  | 'Mistweaver'
-  | 'Devastation'
-  | 'Preservation'
-  | 'Augmentation';
+  | PriestClassSpec
+  | WarriorClassSpec
+  | MageClassSpec
+  | RogueClassSpec
+  | HunterClassSpec
+  | WarlockClassSpec
+  | ShamanClassSpec
+  | DruidClassSpec
+  | PaladinClassSpec
+  | DemonHunterClassSpec
+  | DeathKnightClassSpec
+  | MonkClassSpec
+  | EvokerClassSpec;
 
 export type ClassRole = 'DPS' | 'TANK' | 'HEALING';
 export type ClassFilter = ClassRole | 'ALL';
@@ -63,8 +55,8 @@ export interface Character {
   faction?: 'horde' | 'alliance';
   achievement_points?: number;
   honorable_kills?: number;
-  region?: 'eu';
-  realm?: "Quel'Thalas" | 'Azjol-Nerub';
+  region?: Lowercase<Region>;
+  realm?: string;
   last_crawled_at?: string;
   profile_url?: string;
   profile_banner?: string;
