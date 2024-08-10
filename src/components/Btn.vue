@@ -15,7 +15,7 @@ const classes = ref({
   info: 'bg-blue-600 hover:bg-blue-600 text-blue-900',
   warning: 'bg-yellow-600 hover:bg-yellow-600 text-yellow-900',
   error: 'bg-red-600 hover:bg-red-600 text-red-900',
-  success: 'bg-green-600 hover:bg-green-600 text-green-900'
+  success: 'bg-green-700 hover:bg-green-600 text-white'
 });
 </script>
 
@@ -23,7 +23,7 @@ const classes = ref({
   <button
     type="button"
     :disabled="disabled"
-    class="rounded px-2 py-1 text-xs font-semibold shadow-sm"
+    class="flex items-center gap-1 rounded px-2 py-1 text-xs font-semibold shadow-sm"
     :class="[disabled ? 'opacity-75 cursor-not-allowed' : '', classes[type]]"
   >
     <slot />

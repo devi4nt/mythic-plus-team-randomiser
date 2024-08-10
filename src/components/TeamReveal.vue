@@ -2,7 +2,7 @@
 import type { Team } from '../types';
 import Player from './Player.vue';
 import { computed, ref, watch } from 'vue';
-import { useIntervalFn } from '@vueuse/core';
+import { useIntervalFn, useTimeoutFn } from '@vueuse/core';
 import ConfettiExplosion from 'vue-confetti-explosion';
 import { classColourLookup } from '../utils/colours';
 
@@ -11,6 +11,7 @@ const props = defineProps<{
   team: Team;
 }>();
 
+const flash = ref(false);
 const showConfetti = ref(false);
 const team = computed(() => props.team);
 const amount = ref(0);
@@ -34,6 +35,11 @@ watch(
       if (amount.value > 5) {
         showConfetti.value = true;
         pause();
+      } else {
+        flash.value = true;
+        useTimeoutFn(() => {
+          flash.value = false;
+        }, 150);
       }
     }, 500);
   },
@@ -49,7 +55,10 @@ watch(
       :particle-size="16"
       :colors="colors"
     />
-    <div class="fixed inset-0 bg-[#454545] bg-opacity-75 transition-opacity" />
+    <div
+      class="fixed inset-0 bg-opacity-75 transition-all"
+      :class="[flash ? 'bg-[#656565]' : 'bg-[#454545]']"
+    />
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
       <div class="flex flex-col bg-[#494949] w-[400px] h-[340px] gap-2 rounded-md drop-shadow-md">
         <div class="font-bold text-4xl text-gray-400 pl-4 pt-4">Team {{ number }}</div>

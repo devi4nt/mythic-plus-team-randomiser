@@ -1,4 +1,4 @@
-import type { Team } from '../types';
+import type { Member, Team } from '../types';
 import { pause } from '../utils/time';
 import { useSessionStorage } from '@vueuse/core';
 import { defineStore, storeToRefs } from 'pinia';
@@ -30,11 +30,31 @@ export const useTeamsStore = defineStore('teams', () => {
     return team;
   }
 
+  function swap(sourceTeam?: Team, source?: Member, destination?: Member) {
+    if (!sourceTeam || !source || !destination || sourceTeam.members.includes(destination)) {
+      console.error('error swapping members', { sourceTeam, source, destination });
+      return;
+    }
+    // prevent swapping of members with different roles
+    if (source.character.active_spec_role !== destination.character.active_spec_role) {
+      return;
+    }
+    const destinationTeam = teams.value.find((team) =>
+      team.members.find((member) => member === destination)
+    );
+    if (!destinationTeam) {
+      return;
+    }
+    destinationTeam.members[destinationTeam.members.indexOf(destination)] = source;
+    sourceTeam.members[sourceTeam.members.indexOf(source)] = destination;
+  }
+
   return {
     teams,
     showTeam,
     add,
     remove,
-    reset
+    reset,
+    swap
   };
 });

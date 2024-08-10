@@ -1,5 +1,6 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
+import { characterClass, characterSpecClass, characterTextClass } from '../utils/classes';
 import type { Character, ClassRole } from '../types';
 import { computed } from 'vue';
 
@@ -8,16 +9,9 @@ const props = defineProps<{
   pug?: boolean;
 }>();
 
-const safeClass = (name: string) => {
-  return name.toLowerCase().replace(/ /g, '-');
-};
-const specClass = computed(
-  () =>
-    'spec_' + safeClass(props.character.class) + '_' + safeClass(props.character.active_spec_name)
-);
-const classClass = computed(() => 'class_' + safeClass(props.character.class));
-
-const textClass = computed(() => 'class-color--' + safeClass(props.character.class));
+const specClass = computed(() => characterSpecClass(props.character));
+const classClass = computed(() => characterClass(props.character));
+const textClass = computed(() => characterTextClass(props.character));
 
 const roles: Record<ClassRole, string> = {
   DPS: 'Damage dealer',
