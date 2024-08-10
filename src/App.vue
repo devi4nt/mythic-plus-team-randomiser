@@ -15,7 +15,8 @@ import { useAlertStore } from './stores/alert.store';
 import { useConfigStore } from './stores/config.store';
 import { useTeamsStore } from './stores/teams.store';
 import { decompressFromEncodedURIComponent } from 'lz-string';
-import type { IShareData } from './types';
+import type { IShareData, Region } from './types';
+import { regions } from './data/realms';
 
 const showInfo = ref(false);
 const showSettings = ref(false);
@@ -56,6 +57,17 @@ onMounted(() => {
       }
     } catch (e) {
       console.error('unable to parse share data', e);
+    }
+  } else {
+    const setRegion = params.get('region')?.toUpperCase() as Region;
+    if (regions.find((r) => r.value === setRegion)) {
+      region.value = setRegion;
+    }
+    if (params.get('realm')) {
+      realm.value = params.get('realm');
+    }
+    if (params.get('guild')) {
+      guild.value = params.get('guild');
     }
   }
   initialised.value = true;
