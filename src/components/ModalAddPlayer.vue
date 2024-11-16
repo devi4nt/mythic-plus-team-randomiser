@@ -8,6 +8,9 @@ import { XMarkIcon } from '@heroicons/vue/20/solid';
 import { regions, realms } from '../data/realms';
 import type { Character, Region } from '../types';
 import { useFetch, useSessionStorage, onKeyStroke } from '@vueuse/core';
+import { useConfigStore } from '../stores/config.store';
+import { useMembersStore } from '../stores/members.store';
+import { storeToRefs } from 'pinia';
 
 const emit = defineEmits<{
   (event: 'close'): void;
@@ -18,6 +21,11 @@ defineProps<{
   show: boolean;
   preventClose?: boolean;
 }>();
+
+const config = useConfigStore();
+const { autoPug } = storeToRefs(config);
+
+const members = useMembersStore();
 
 const region = useSessionStorage<Region>('add.region', 'EU');
 const realm = useSessionStorage('add.realm', '');
@@ -31,6 +39,7 @@ const regionRealms = computed(() =>
 
 const error = ref('');
 const loading = ref(false);
+
 async function add() {
   if (!region.value || !realm.value || !character.value) {
     error.value = 'Please select a region, realm and character name.';
@@ -127,6 +136,7 @@ onKeyStroke('Enter', add, { target: trigger });
         </div>
         <div class="flex gap-2">
           <Loader v-if="loading" />
+          <Btn v-if="!autoPug" @click="members.addPug()" class="font-bold"> ADD PUG </Btn>
           <Btn class="font-bold" @click="add()"> ADD </Btn>
         </div>
       </div>

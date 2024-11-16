@@ -23,7 +23,7 @@ const classes = ref({
   <button
     type="button"
     :disabled="disabled"
-    class="flex items-center gap-1 rounded px-2 py-1 text-xs font-semibold shadow-sm"
+    class="flex items-center justify-center gap-1 rounded px-2 py-1 text-xs font-semibold shadow-sm"
     :class="[disabled ? 'opacity-75 cursor-not-allowed' : '', classes[type]]"
   >
     <slot />

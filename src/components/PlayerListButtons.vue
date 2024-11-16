@@ -3,10 +3,9 @@ import { BoltIcon } from '@heroicons/vue/20/solid';
 import type { Member, Team } from '../types';
 import Btn from './Btn.vue';
 
-const emit = defineEmits(['add', 'randomise', 'addPug', 'reset']);
+const emit = defineEmits(['add', 'randomise', 'reset']);
 
 defineProps<{
-  autoPug: boolean;
   selectedMembers: Member[];
   minPlayers: number;
   teams: Team[];
@@ -16,7 +15,6 @@ defineProps<{
 <template>
   <div class="flex justify-between gap-2 my-2">
     <div class="flex gap-2">
-      <Btn v-if="!autoPug" @click="emit('addPug')" class="font-bold block md:hidden"> ADD PUG </Btn>
       <Btn @click="emit('add')" class="font-bold block md:hidden"> ADD </Btn>
       <Btn
         :disabled="!selectedMembers.length && !teams.length"

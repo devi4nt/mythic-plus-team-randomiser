@@ -17,7 +17,7 @@ defineProps<{
 const showAddPlayer = ref(false);
 
 const configStore = useConfigStore();
-const { autoPug, minPlayers } = storeToRefs(configStore);
+const { minPlayers } = storeToRefs(configStore);
 
 const members = useMembersStore();
 const { rolesText, selectedMembers, filteredMembers } = storeToRefs(members);
@@ -45,12 +45,7 @@ function onDrop(event: DragEvent) {
   >
     <div class="flex justify-between">
       <div class="font-bold text-gray-400">Players</div>
-      <div class="flex gap-2">
-        <Btn v-if="!autoPug" @click="members.addPug()" class="font-bold hidden md:block">
-          ADD PUG
-        </Btn>
-        <Btn @click="showAddPlayer = true" class="font-bold hidden md:block"> ADD </Btn>
-      </div>
+      <Btn @click="showAddPlayer = true" class="font-bold hidden md:block"> ADD </Btn>
     </div>
     <div
       class="border border-dashed rounded-md h-[94px] w-full md:w-64 my-2 flex items-center justify-center text-sm font-bold transition-colors"
@@ -62,15 +57,22 @@ function onDrop(event: DragEvent) {
       v-if="selectedMembers.length > 10"
       @add="showAddPlayer = true"
       @randomise="members.randomise()"
-      @add-pug="members.addPug()"
       @reset="members.reset()"
-      :auto-pug="autoPug"
       :selected-members="selectedMembers"
       :min-players="minPlayers"
       :teams="teams"
     />
-    <div class="flex justify-between py-1" v-for="(member, index) in selectedMembers" :key="index">
-      <Player :character="member.character" :pug="member.pug" />
+    <div
+      class="flex justify-between hover:bg-[#454545] py-1 rounded-sm"
+      :class="{ 'opacity-50': member.picked }"
+      v-for="(member, index) in selectedMembers"
+      :key="index"
+    >
+      <Player
+        :title="member.character.active_spec_role"
+        :character="member.character"
+        :pug="member.pug"
+      />
       <div class="flex items-center">
         <span title="Toggle team captain">
           <StarIcon
@@ -104,9 +106,7 @@ function onDrop(event: DragEvent) {
     <PlayerListButtons
       @add="showAddPlayer = true"
       @randomise="members.randomise()"
-      @add-pug="members.addPug()"
       @reset="members.reset()"
-      :auto-pug="autoPug"
       :selected-members="selectedMembers"
       :min-players="minPlayers"
       :teams="teams"

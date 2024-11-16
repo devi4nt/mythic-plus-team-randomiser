@@ -70,7 +70,7 @@ function handleTap(event: TouchEvent, member: Member) {
     <div class="w-full flex text-gray-400 text-sm">Double click to select players</div>
     <div class="grid grid-cols-2 md:grid-cols-1 gap-x-4" :class="{ 'opacity-40': isFetching }">
       <div
-        class="flex justify-between hover:bg-[#454545] cursor-pointer py-1"
+        class="flex justify-between hover:bg-[#454545] cursor-pointer py-1 rounded-sm"
         v-for="(member, index) in filteredMembers"
         :key="index"
         :draggable="true"
