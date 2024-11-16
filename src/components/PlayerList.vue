@@ -64,10 +64,15 @@ function onDrop(event: DragEvent) {
     />
     <div
       class="flex justify-between hover:bg-[#454545] py-1 rounded-sm"
+      :class="{ 'opacity-50': member.picked }"
       v-for="(member, index) in selectedMembers"
       :key="index"
     >
-      <Player :character="member.character" :pug="member.pug" />
+      <Player
+        :title="member.character.active_spec_role"
+        :character="member.character"
+        :pug="member.pug"
+      />
       <div class="flex items-center">
         <span title="Toggle team captain">
           <StarIcon

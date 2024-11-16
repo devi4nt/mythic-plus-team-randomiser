@@ -82,6 +82,7 @@ export interface Member {
   character: Character;
   captain?: boolean;
   pug?: boolean;
+  picked?: boolean;
 }
 
 export interface IAlert {

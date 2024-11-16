@@ -58,6 +58,20 @@ export const useMembersStore = defineStore('members', () => {
 
   const pickedMembers = ref<Member[]>([]);
   const selectedMembers = useSessionStorage<Member[]>('selected', []);
+
+  watch(
+    () => teams,
+    () => {
+      // mark all players which were picked
+      for (const member of selectedMembers.value) {
+        member.picked = teams.value.some((team) =>
+          team.members.find((m) => m.character.name === member.character.name)
+        );
+      }
+    },
+    { immediate: true, deep: true }
+  );
+
   const pugs = useSessionStorage<Member[]>('pugs', []);
 
   const tanks = computed(() =>
