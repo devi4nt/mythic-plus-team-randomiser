@@ -37,12 +37,16 @@ describe('members store', () => {
     const store = useMembersStore();
     // mock add function, structuredClone doesn't seem to be working in this context?!
     store.add = (member: Member) => {
-      store.selectedMembers.push({ ...member });
+      store.selectedMembers.push({ ...member, character: { ...member.character } });
     };
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
+
+    // reset store
+    const store = useMembersStore();
+    store.reset();
   });
 
   test('it is defined', async () => {
@@ -66,6 +70,11 @@ describe('members store', () => {
     store.statusCode = 200;
     await nextTick();
     expect(alert.fatal).not.toBeDefined();
+  });
+
+  test('has members', async () => {
+    const store = useMembersStore();
+    expect(store.members.length).toBe(10);
   });
 
   test('it can filter members', async () => {
@@ -95,6 +104,31 @@ describe('members store', () => {
     // no match filter
     store.filter = 'XXXXXXXXXXXXXXX';
     expect(store.filteredMembers.length).toBe(0);
+  });
+
+  test('it can change member role', async () => {
+    const store = useMembersStore();
+    store.addPug('TANK');
+    const pug = store.selectedMembers[0];
+    expect(pug).toBeDefined();
+
+    if (pug) {
+      const { character } = pug;
+      expect(character.active_spec_role).toBe('TANK');
+      expect(character.active_spec_name).toBe('Brewmaster');
+
+      store.toggleSpec(pug!);
+      expect(character.active_spec_role).toBe('HEALING');
+      expect(character.active_spec_name).toBe('Mistweaver');
+
+      store.toggleSpec(pug!);
+      expect(character.active_spec_role).toBe('DPS');
+      expect(character.active_spec_name).toBe('Windwalker');
+
+      store.toggleSpec(pug!);
+      expect(character.active_spec_role).toBe('TANK');
+      expect(character.active_spec_name).toBe('Brewmaster');
+    }
   });
 
   test('it can pick teams', async () => {
@@ -137,6 +171,52 @@ describe('members store', () => {
     expect(store.rolesText).toBe('');
     expect(teams.teams.length).toBe(0);
   });
+
+  test(
+    'it can allow players to fulfil multiple roles',
+    {
+      repeats: 10
+    },
+    async () => {
+      const store = useMembersStore();
+      for (const member of store.filteredMembers) {
+        store.add(member);
+        store.toggleSpec(member);
+        store.add(member);
+        store.toggleSpec(member);
+        store.add(member);
+      }
+      // we need to add a few pugs to ensure we always have enough roles to
+      // make 2 teams after duplicate names are removed
+      store.addPug('TANK');
+      store.addPug('TANK');
+      store.addPug('HEALING');
+      store.addPug('HEALING');
+
+      expect(store.selectedMembers.length).toBe(34);
+
+      await store.randomise();
+
+      const teams = useTeamsStore();
+      expect(teams.teams.length).toBe(2);
+
+      for (const team of teams.teams) {
+        expect(team.members.length).toBe(5);
+        expect(
+          team.members.filter((member) => member.character.active_spec_role === 'TANK').length
+        ).toBe(1);
+        expect(
+          team.members.filter((member) => member.character.active_spec_role === 'DPS').length
+        ).toBe(3);
+        expect(
+          team.members.filter((member) => member.character.active_spec_role === 'HEALING').length
+        ).toBe(1);
+
+        const unique = new Set(team.members.map((member) => member.character.name));
+        expect(unique.size).toBe(5);
+      }
+    }
+  );
 
   test('it can make a pug team', async () => {
     const store = useMembersStore();
@@ -195,7 +275,6 @@ describe('members store', () => {
     expect(alert.error).toBe('Not enough dps');
 
     // reset
-    store.reset();
     store.reset();
 
     // check not enough healers
