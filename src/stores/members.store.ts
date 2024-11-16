@@ -178,7 +178,8 @@ export const useMembersStore = defineStore('members', () => {
       character: {
         name: uuidv4(),
         class: 'Monk',
-        active_spec_name: 'Windwalker',
+        active_spec_name:
+          role === 'TANK' ? 'Brewmaster' : role === 'HEALING' ? 'Mistweaver' : 'Windwalker',
         active_spec_role: role
       },
       pug: true
