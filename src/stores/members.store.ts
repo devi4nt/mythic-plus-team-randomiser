@@ -54,7 +54,13 @@ export const useMembersStore = defineStore('members', () => {
 
   const selectedNames = reactive(new Set<string>());
   const members = computed(
-    () => data.value?.members.filter((m) => m.character.active_spec_name) ?? []
+    () =>
+      data.value?.members
+        .filter((m) => m.character.active_spec_name)
+        .map((m) => ({
+          ...m,
+          search: m.character.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        })) ?? []
   );
 
   const pickedMembers = ref<Member[]>([]);
@@ -131,7 +137,12 @@ export const useMembersStore = defineStore('members', () => {
             // apply text filter
             const textFilter =
               filter.value === '' ||
-              [member.character.name, member.character.class, member.character.active_spec_name]
+              [
+                member.character.name,
+                member.character.class,
+                member.character.active_spec_name,
+                member.search
+              ]
                 .join(' ')
                 .toLowerCase()
                 .includes(filter.value.toLowerCase());

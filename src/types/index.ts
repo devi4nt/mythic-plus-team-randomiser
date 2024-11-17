@@ -80,6 +80,7 @@ export interface GuildProfile {
 export interface Member {
   rank: number;
   character: Character;
+  search?: string;
   captain?: boolean;
   pug?: boolean;
   picked?: boolean;

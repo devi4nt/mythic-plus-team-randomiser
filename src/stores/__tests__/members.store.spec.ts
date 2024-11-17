@@ -101,6 +101,12 @@ describe('members store', () => {
     store.filter = 'Quelish';
     expect(store.filteredMembers.length).toBe(1);
 
+    store.filter = 'Devølutiøn';
+    expect(store.filteredMembers.length).toBe(1);
+
+    store.filter = 'Devolution'; // check diacritics are normalised
+    expect(store.filteredMembers.length).toBe(1);
+
     // no match filter
     store.filter = 'XXXXXXXXXXXXXXX';
     expect(store.filteredMembers.length).toBe(0);
