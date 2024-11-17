@@ -23,7 +23,8 @@ const {
   // rank,
   filter,
   isFetching,
-  filteredMembers
+  filteredMembers,
+  selectedNames
 } = storeToRefs(members);
 
 function startDrag(event: DragEvent, member: Member) {
@@ -71,6 +72,7 @@ function handleTap(event: TouchEvent, member: Member) {
     <div class="grid grid-cols-2 md:grid-cols-1 gap-x-4" :class="{ 'opacity-40': isFetching }">
       <div
         class="flex justify-between hover:bg-[#454545] cursor-pointer py-1 rounded-sm"
+        :class="{ 'opacity-50': selectedNames.has(member.character.name) }"
         v-for="(member, index) in filteredMembers"
         :key="index"
         :draggable="true"

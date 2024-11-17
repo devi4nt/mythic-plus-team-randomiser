@@ -1,7 +1,7 @@
 import type { ClassFilter, ClassRole, GuildProfile, Member, Team } from '../types';
 import { useFetch, useSessionStorage } from '@vueuse/core';
 import { defineStore, storeToRefs } from 'pinia';
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, reactive } from 'vue';
 import { useConfigStore } from './config.store';
 import { shuffle } from '../utils/array';
 import { classSpecLust, classSpecRole, classSpecs } from '../data/specs';
@@ -52,12 +52,24 @@ export const useMembersStore = defineStore('members', () => {
     { immediate: true }
   );
 
+  const selectedNames = reactive(new Set<string>());
   const members = computed(
     () => data.value?.members.filter((m) => m.character.active_spec_name) ?? []
   );
 
   const pickedMembers = ref<Member[]>([]);
   const selectedMembers = useSessionStorage<Member[]>('selected', []);
+
+  watch(
+    () => selectedMembers.value.length,
+    () => {
+      selectedNames.clear();
+      for (const member of selectedMembers.value) {
+        selectedNames.add(member.character.name);
+      }
+    },
+    { immediate: true }
+  );
 
   watch(
     () => teams,
@@ -376,6 +388,7 @@ export const useMembersStore = defineStore('members', () => {
     rolesText,
     members,
     selectedMembers,
+    selectedNames,
     filteredMembers,
     isFetching,
     statusCode,
