@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
 import { ExclamationTriangleIcon } from '@heroicons/vue/20/solid';
 import { useTimeoutFn } from '@vueuse/core';

@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
 import { characterClass, characterSpecClass, characterTextClass } from '../utils/classes';
 import type { Character, ClassRole } from '../types';
