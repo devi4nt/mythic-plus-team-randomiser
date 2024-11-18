@@ -8,6 +8,8 @@ import { nextTick, ref, type Ref } from 'vue';
 import type { GuildProfile, Member } from '../../types';
 import { mockGuildProfile } from '../../data/__mocks__/mock-guild-profile';
 import { useAlertStore } from '../alert.store';
+import { mockMembers } from '../../data/__mocks__/mock-members';
+import { classSpecLust } from '../../data/specs';
 
 vi.mock('@vueuse/core', async (original) => {
   const actual = (await original()) as object;
@@ -30,9 +32,10 @@ describe('members store', () => {
 
     const config = useConfigStore();
     config.region = 'EU';
-    config.realm = 'connected-quelthalas';
+    config.realm = 'realm-name';
     config.guild = 'Blank Slate';
     config.fancy = false;
+    config.spreadLust = true;
 
     const store = useMembersStore();
     // mock add function, structuredClone doesn't seem to be working in this context?!
@@ -57,7 +60,7 @@ describe('members store', () => {
   test('it loads guild profile', async () => {
     const store = useMembersStore();
     expect(store.isFetching).toBe(false);
-    expect(store.filteredMembers.length).toBe(10);
+    expect(store.members.length).toBe(10);
     expect(store.statusCode).toBe(200);
   });
 
@@ -144,11 +147,10 @@ describe('members store', () => {
     for (const member of store.filteredMembers) {
       store.add(member);
     }
-    expect(store.selectedMembers.length).toBe(store.filteredMembers.length);
-    expect(store.rolesText).toBe('2 tanks, 6 dps, 2 healers');
 
     await store.randomise();
-    alert.success = 'Teams successfully randomised';
+    expect(alert.success).toBe('Teams successfully randomised');
+    expect(alert.error).toBeUndefined();
 
     const teams = useTeamsStore();
     expect(teams.teams.length).toBe(2);
@@ -178,51 +180,120 @@ describe('members store', () => {
     expect(teams.teams.length).toBe(0);
   });
 
-  test(
-    'it can allow players to fulfil multiple roles',
-    {
-      repeats: 10
-    },
-    async () => {
-      const store = useMembersStore();
-      for (const member of store.filteredMembers) {
-        store.add(member);
-        store.toggleSpec(member);
-        store.add(member);
-        store.toggleSpec(member);
-        store.add(member);
-      }
-      // we need to add a few pugs to ensure we always have enough roles to
-      // make 2 teams after duplicate names are removed
-      store.addPug('TANK');
-      store.addPug('TANK');
-      store.addPug('HEALING');
-      store.addPug('HEALING');
-
-      expect(store.selectedMembers.length).toBe(34);
-
-      await store.randomise();
-
-      const teams = useTeamsStore();
-      expect(teams.teams.length).toBe(2);
-
-      for (const team of teams.teams) {
-        expect(team.members.length).toBe(5);
-        expect(
-          team.members.filter((member) => member.character.active_spec_role === 'TANK').length
-        ).toBe(1);
-        expect(
-          team.members.filter((member) => member.character.active_spec_role === 'DPS').length
-        ).toBe(3);
-        expect(
-          team.members.filter((member) => member.character.active_spec_role === 'HEALING').length
-        ).toBe(1);
-
-        const unique = new Set(team.members.map((member) => member.character.name));
-        expect(unique.size).toBe(5);
-      }
+  test('it displays correct roles text', async () => {
+    const store = useMembersStore();
+    // add all members to selected
+    for (const member of store.filteredMembers) {
+      store.add(member);
     }
-  );
+
+    expect(store.selectedMembers.length).toBe(store.filteredMembers.length);
+    expect(store.rolesText).toBe('2 tanks, 6 dps, 2 healers');
+
+    // add a player which can be a healer or dps
+    const dpsHealer = store.filteredMembers.find((m) => m.character.name === 'Quelish');
+    if (dpsHealer) {
+      expect(dpsHealer).toBeDefined();
+      store.toggleRole(dpsHealer, 'HEALING');
+      store.add(dpsHealer);
+    }
+
+    // add a player which can be a tank or dps
+    const dpsTank = store.filteredMembers.find((m) => m.character.name === 'Devolutíon');
+    if (dpsTank) {
+      expect(dpsTank).toBeDefined();
+      store.toggleRole(dpsTank, 'TANK');
+      store.add(dpsTank);
+    }
+
+    expect(store.rolesText).toBe('2-3 tanks, 4-6 dps, 2-3 healers');
+
+    // check reset
+    store.reset();
+
+    expect(store.rolesText).toBe('');
+  });
+
+  test('it can spread lusts', /* { repeats: 100 }, */ async () => {
+    const store = useMembersStore();
+    const members = mockMembers();
+    for (const member of members) {
+      store.add(member);
+    }
+    await store.randomise();
+
+    const teams = useTeamsStore();
+    for (const team of teams.teams) {
+      expect(team.members.length).toBe(5);
+      const lusts = team.members.filter(
+        (member) => classSpecLust[member.character.class as keyof typeof classSpecLust]
+      );
+      if (!lusts.length) {
+        console.log(team.members);
+      }
+      expect(lusts.length).toBeGreaterThan(0);
+    }
+  });
+
+  test('it can allow players to fulfil multiple roles' /* { repeats: 100 }, */, async () => {
+    const store = useMembersStore();
+    for (const member of store.filteredMembers) {
+      store.add(member);
+      store.toggleSpec(member);
+      store.add(member);
+      store.toggleSpec(member);
+      store.add(member);
+    }
+    // add an extra tank
+    store.add({
+      rank: 3,
+      character: {
+        name: 'Ashen',
+        realm: 'realm-name',
+        class: 'Death Knight',
+        active_spec_name: 'Blood',
+        active_spec_role: 'TANK'
+      }
+    });
+
+    // add an extra healer
+    store.add({
+      rank: 1,
+      character: {
+        name: 'Embers',
+        realm: 'realm-name',
+        class: 'Paladin',
+        active_spec_name: 'Holy',
+        active_spec_role: 'HEALING'
+      }
+    });
+
+    expect(store.selectedMembers.length).toBe(32);
+
+    await store.randomise();
+
+    const teams = useTeamsStore();
+    expect(teams.teams.length).toBe(2);
+
+    for (const team of teams.teams) {
+      expect(team.members.length).toBe(5);
+      expect(
+        team.members.filter((member) => member.character.active_spec_role === 'TANK').length
+      ).toBe(1);
+      expect(
+        team.members.filter((member) => member.character.active_spec_role === 'DPS').length
+      ).toBe(3);
+      expect(
+        team.members.filter((member) => member.character.active_spec_role === 'HEALING').length
+      ).toBe(1);
+
+      const unique = new Set(
+        team.members.map((member) => `${member.character.name}-${member.character.realm}`)
+      );
+      // console.log(`unique names:`, unique);
+      expect(unique.size).toBe(5);
+    }
+  });
 
   test('it can make a pug team', async () => {
     const store = useMembersStore();

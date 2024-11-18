@@ -56,7 +56,7 @@ export interface Character {
   achievement_points?: number;
   honorable_kills?: number;
   region?: Lowercase<Region>;
-  realm?: string;
+  realm: string;
   last_crawled_at?: string;
   profile_url?: string;
   profile_banner?: string;

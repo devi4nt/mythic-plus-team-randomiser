@@ -25,11 +25,15 @@ const { teams } = storeToRefs(teamsStore);
 const config = useConfigStore();
 const { region, realm, guild } = storeToRefs(config);
 
-function swap(swapName?: string, destination?: Member) {
+function swap(name?: string, realm?: string, destination?: Member) {
   const team = teams.value.find((team) =>
-    team.members.find((member) => member.character.name === swapName)
+    team.members.find(
+      (member) => member.character.name === name && member.character.realm === realm
+    )
   );
-  const source = team?.members.find((member) => member.character.name === swapName);
+  const source = team?.members.find(
+    (member) => member.character.name === name && member.character.realm === realm
+  );
   teamsStore.swap(team, source, destination);
 }
 
@@ -41,6 +45,7 @@ function share() {
       rank: member.rank,
       character: {
         name: member.character.name,
+        realm: member.character.realm,
         class: member.character.class,
         active_spec_name: member.character.active_spec_name,
         active_spec_role: member.character.active_spec_role
@@ -59,6 +64,7 @@ function share() {
         rank: member.rank,
         character: {
           name: member.character.name,
+          realm: member.character.realm,
           class: member.character.class,
           active_spec_name: member.character.active_spec_name,
           active_spec_role: member.character.active_spec_role

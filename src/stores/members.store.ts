@@ -65,6 +65,13 @@ export const useMembersStore = defineStore('members', () => {
 
   const pickedMembers = ref<Member[]>([]);
   const selectedMembers = useSessionStorage<Member[]>('selected', []);
+  const uniquePlayers = computed(() => {
+    const unique = new Set<string>();
+    for (const member of selectedMembers.value) {
+      unique.add(`${member.character.name}-${member.character.realm}`);
+    }
+    return unique;
+  });
 
   watch(
     () => selectedMembers.value.length,
@@ -83,7 +90,11 @@ export const useMembersStore = defineStore('members', () => {
       // mark all players which were picked
       for (const member of selectedMembers.value) {
         member.picked = teams.value.some((team) =>
-          team.members.find((m) => m.character.name === member.character.name)
+          team.members.find(
+            (m) =>
+              m.character.name === member.character.name &&
+              m.character.realm === member.character.realm
+          )
         );
       }
     },
@@ -112,21 +123,65 @@ export const useMembersStore = defineStore('members', () => {
 
   const rolesText = computed(() => {
     let text = '';
-    if (tanks.value.length) {
-      text += `${tanks.value.length} tank${tanks.value.length > 1 ? 's' : ''}`;
-      if (damageDealers.value.length || healers.value.length) {
+    const players = [...tanks.value, ...damageDealers.value, ...healers.value];
+    if (!players.length) return '';
+
+    const roleMap = new Map<string, ClassRole[]>();
+    for (const member of players) {
+      const roles = roleMap.get(`${member.character.name}-${member.character.realm}`) ?? [];
+      roles.push(member.character.active_spec_role);
+      roleMap.set(`${member.character.name}-${member.character.realm}`, roles);
+    }
+    // console.log(roleMap);
+
+    const dps = { min: 0, max: 0 };
+    const healer = { min: 0, max: 0 };
+    const tank = { min: 0, max: 0 };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    for (const [_name, roles] of roleMap) {
+      const [role] = roles;
+      if (roles.length === 1) {
+        if (role === 'DPS') {
+          dps.min++;
+          dps.max++;
+        } else if (role === 'HEALING') {
+          healer.min++;
+          healer.max++;
+        } else {
+          tank.min++;
+          tank.max++;
+        }
+      } else {
+        // player can be multiple roles
+        if (roles.find((r) => r === 'DPS')) {
+          dps.max++;
+        }
+        if (roles.find((r) => r === 'HEALING')) {
+          healer.max++;
+        }
+        if (roles.find((r) => r === 'TANK')) {
+          tank.max++;
+        }
+      }
+    }
+    // console.log({ dps, healer, tank });
+
+    if (tank.max) {
+      text += `${tank.min === tank.max ? tank.min : `${tank.min}-${tank.max}`} tank${tank.min > 1 ? 's' : ''}`;
+      if (dps.max || healer.max) {
         text += ', ';
       }
     }
-    if (damageDealers.value.length) {
-      text += `${damageDealers.value.length} dps`;
-      if (healers.value.length) {
+    if (dps.max) {
+      text += `${dps.min === dps.max ? dps.min : `${dps.min}-${dps.max}`} dps`;
+      if (healer.max) {
         text += ', ';
       }
     }
-    if (healers.value.length) {
-      text += `${healers.value.length} healer${healers.value.length > 1 ? 's' : ''}`;
+    if (healer.max) {
+      text += `${healer.min === healer.max ? healer.min : `${healer.min}-${healer.max}`} healer${healer.min > 1 ? 's' : ''}`;
     }
+
     return text;
   });
 
@@ -181,6 +236,15 @@ export const useMembersStore = defineStore('members', () => {
     member.captain = !member.captain;
   }
 
+  function toggleRole(member: Member, role: ClassRole) {
+    const specs = classSpecs[member.character.class];
+    const newSpec = specs.find((spec) => classSpecRole[member.character.class][spec] === role);
+    if (newSpec) {
+      member.character.active_spec_name = newSpec;
+      member.character.active_spec_role = role;
+    }
+  }
+
   function toggleSpec(member: Member) {
     const specs = classSpecs[member.character.class];
     const currentIndex = specs.indexOf(member.character.active_spec_name);
@@ -203,7 +267,8 @@ export const useMembersStore = defineStore('members', () => {
         class: 'Monk',
         active_spec_name:
           role === 'TANK' ? 'Brewmaster' : role === 'HEALING' ? 'Mistweaver' : 'Windwalker',
-        active_spec_role: role
+        active_spec_role: role,
+        realm: realm.value
       },
       pug: true
     };
@@ -226,6 +291,7 @@ export const useMembersStore = defineStore('members', () => {
 
     // auto pug logic
     if (autoPug.value) {
+      // console.log(`auto pug logic`);
       // remove existing pugs
       const currentPugs = selectedMembers.value.filter((member) => member.pug);
       currentPugs.forEach((member) => remove(member));
@@ -255,13 +321,13 @@ export const useMembersStore = defineStore('members', () => {
     }
 
     // target number of teams
-    const uniqueNames = new Set(selectedMembers.value.map((member) => member.character.name));
-    const amount = Math.ceil(uniqueNames.size / 5);
-    // console.log(`randomising ${amount} teams`);
+    const amount = Math.ceil(uniquePlayers.value.size / 5);
+    // console.log(`\n> attempting to randomising ${amount} teams`);
 
     // lust allocation logic
     let lusts: (Member | undefined)[] = [];
     if (spreadLust.value) {
+      // console.log(`spreading lust`);
       // when the captain overlaps with a lust, fill in a blank
       selectedMembers.value
         .filter((member) => member.captain && classSpecLust[member.character.class])
@@ -274,10 +340,10 @@ export const useMembersStore = defineStore('members', () => {
       shuffle(nonCaptainsWithLust);
       for (const member of nonCaptainsWithLust) {
         if (lusts.length < amount) {
-          pickedMembers.value.push(member);
           lusts.push(member);
         }
       }
+      // console.log(`lusts: ${lusts.map((m) => m?.character.name).join(', ')}`);
     }
 
     // captain allocation logic
@@ -285,28 +351,42 @@ export const useMembersStore = defineStore('members', () => {
     if (captains.length > amount) {
       error.value = 'Too many team captains';
       return;
-    } else {
-      pickedMembers.value.push(...captains);
     }
+    // if (captains.length) {
+    //   console.log(`captains: ${captains.map((m) => m?.character.name).join(', ')}`);
+    // }
 
     let workingMembers = [...selectedMembers.value];
+
     /* remove already picked members, lusts and captains */
-    function pruneWorkingMembers(name: string) {
-      workingMembers = workingMembers.filter((m) => name !== m.character.name);
-      lusts = lusts.filter((m) => name !== m?.character.name);
-      captains = captains.filter((m) => name !== m.character.name);
+    function pruneWorkingMembers(name: string, realm: string) {
+      workingMembers = workingMembers.filter(
+        (m) => name !== m.character.name || realm !== m.character.realm
+      );
+      lusts = lusts.filter((m) => name !== m?.character.name || realm !== m?.character.realm);
+      captains = captains.filter((m) => name !== m.character.name || realm !== m.character.realm);
     }
 
     for (let index = 0; index < amount; index++) {
+      // console.log(`randomising team ${index + 1}`);
       const members: Member[] = [];
       shuffle(workingMembers); // shuffle eligible members
 
       const captain = captains.shift();
+      // if (captain) {
+      //   console.log(
+      //     `captain: ${captain.character.name} role: ${captain.character.active_spec_role}`
+      //   );
+      // }
 
       const lust = lusts.shift();
       if (lust) {
-        workingMembers.unshift(lust);
+        // console.log(`lust: ${lust.character.name} role: ${lust.character.active_spec_role}`);
+        pruneWorkingMembers(lust.character.name, lust.character.realm);
       }
+      // if (lust) {
+      //   workingMembers.unshift(lust);
+      // }
 
       const tank =
         captain?.character.active_spec_role === 'TANK'
@@ -314,49 +394,74 @@ export const useMembersStore = defineStore('members', () => {
           : workingMembers.find((member) => member.character.active_spec_role === 'TANK');
       if (!tank) {
         if (!teams.value.length) {
+          // console.error(`not enough tanks`);
           error.value = 'Not enough tanks';
         }
         break;
       }
       members.push(tank);
-      pruneWorkingMembers(tank.character.name);
+      pruneWorkingMembers(tank.character.name, tank.character.realm);
 
       const dps: Member[] = [];
       if (captain?.character.active_spec_role === 'DPS') {
         dps.push(captain);
+      } else if (lust?.character.active_spec_role === 'DPS') {
+        dps.push(lust);
       }
-      for (const member of workingMembers) {
-        if (dps.find((d) => d.character.name === member.character.name)) continue;
-        if (member.character.active_spec_role === 'DPS') {
-          dps.push(member);
-        }
+      if (dps.length) {
+        pruneWorkingMembers(dps[0].character.name, dps[0].character.realm);
+      }
+
+      for (const member of workingMembers
+        .sort((a, b) => {
+          if (classSpecLust[a.character.class] === classSpecLust[b.character.class]) return 0;
+          return classSpecLust[a.character.class] ? 1 : -1;
+        })
+        .filter((m) => m.character.active_spec_role === 'DPS')) {
+        if (
+          dps.find(
+            (d) =>
+              d.character.name === member.character.name &&
+              d.character.realm === member.character.realm
+          )
+        )
+          continue;
+        dps.push(member);
+        pruneWorkingMembers(member.character.name, member.character.realm);
         if (dps.length === 3) {
           break;
         }
       }
       if (dps.length < 3) {
         if (!teams.value.length) {
+          // console.error(`not enough dps`);
           error.value = 'Not enough dps';
         }
         break;
       }
       members.push(...dps);
-      for (const dd of dps) {
-        pruneWorkingMembers(dd.character.name);
-      }
 
       const healer =
         captain?.character.active_spec_role === 'HEALING'
           ? captain
-          : workingMembers.find((member) => member.character.active_spec_role === 'HEALING');
+          : lust?.character.active_spec_role === 'HEALING'
+            ? lust
+            : workingMembers
+                .sort((a, b) => {
+                  if (classSpecLust[a.character.class] === classSpecLust[b.character.class])
+                    return 0;
+                  return classSpecLust[a.character.class] ? 1 : -1;
+                })
+                .find((member) => member.character.active_spec_role === 'HEALING');
       if (!healer) {
         if (!teams.value.length) {
+          // console.error(`not enough healers`);
           error.value = 'Not enough healers';
         }
         break;
       }
       members.push(healer);
-      pruneWorkingMembers(healer.character.name);
+      pruneWorkingMembers(healer.character.name, healer.character.realm);
 
       pickedMembers.value.push(...members);
       // console.log(
@@ -373,7 +478,7 @@ export const useMembersStore = defineStore('members', () => {
 
     if (!error.value) {
       const roundedAmount = Math.floor(amount);
-      const playersLeft = uniqueNames.size - teams.value.length * 5;
+      const playersLeft = uniquePlayers.value.size - teams.value.length * 5;
       if (amount !== roundedAmount || teams.value.length !== roundedAmount) {
         warning.value = `Too few eligible players to assign all roles ${teams.value.length} teams created, ${playersLeft} players left`;
       } else {
@@ -399,12 +504,13 @@ export const useMembersStore = defineStore('members', () => {
     rolesText,
     members,
     selectedMembers,
-    selectedNames,
+    uniquePlayers,
     filteredMembers,
     isFetching,
     statusCode,
     toggleCaptain,
     toggleSpec,
+    toggleRole,
     remove,
     randomise,
     addPug,

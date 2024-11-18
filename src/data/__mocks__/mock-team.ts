@@ -1,52 +1,17 @@
 import type { Team } from '../../types';
+import { mockMembers } from './mock-members';
 
-export const mockTeam: Team = {
-  id: 'team-one',
-  members: [
-    {
-      rank: 1,
-      character: {
-        name: 'Devølutiøn',
-        class: 'Demon Hunter',
-        active_spec_name: 'Vengeance',
-        active_spec_role: 'TANK'
-      }
-    },
-    {
-      rank: 1,
-      character: {
-        name: 'Quelish',
-        class: 'Priest',
-        active_spec_name: 'Shadow',
-        active_spec_role: 'DPS'
-      }
-    },
-    {
-      rank: 1,
-      character: {
-        name: 'Magemong',
-        class: 'Mage',
-        active_spec_name: 'Fire',
-        active_spec_role: 'DPS'
-      }
-    },
-    {
-      rank: 1,
-      character: {
-        name: 'Omnivoker',
-        class: 'Evoker',
-        active_spec_name: 'Augmentation',
-        active_spec_role: 'DPS'
-      }
-    },
-    {
-      rank: 0,
-      character: {
-        name: 'Shamong',
-        class: 'Shaman',
-        active_spec_name: 'Restoration',
-        active_spec_role: 'HEALING'
-      }
-    }
-  ]
+export const mockTeams = ({ amount }: { amount: number }) => {
+  const teams: Team[] = [];
+  for (let i = 0; i < amount; i++) {
+    teams.push({
+      id: `team-${i}`,
+      members: [
+        ...mockMembers({ amount: 1, roleFilter: 'TANK' }),
+        ...mockMembers({ amount: 3, roleFilter: 'DPS' }),
+        ...mockMembers({ amount: 1, roleFilter: 'HEALING' })
+      ]
+    });
+  }
+  return teams;
 };
