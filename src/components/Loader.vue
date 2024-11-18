@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <div class="flex justify-center items-center">
     <div class="loader -top-2 right-4">Loading...</div>

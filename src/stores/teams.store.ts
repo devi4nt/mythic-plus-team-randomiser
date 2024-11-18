@@ -2,7 +2,7 @@ import type { Member, Team } from '../types';
 import { pause } from '../utils/time';
 import { useSessionStorage } from '@vueuse/core';
 import { defineStore, storeToRefs } from 'pinia';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useConfigStore } from './config.store';
 
 export const useTeamsStore = defineStore('teams', () => {
@@ -11,6 +11,8 @@ export const useTeamsStore = defineStore('teams', () => {
 
   const showTeam = ref<Team>();
   const teams = useSessionStorage<Team[]>('teams', []);
+
+  const amount = computed(() => teams.value.length);
 
   function reset() {
     teams.value.length = 0;
@@ -51,6 +53,7 @@ export const useTeamsStore = defineStore('teams', () => {
 
   return {
     teams,
+    amount,
     showTeam,
     add,
     remove,

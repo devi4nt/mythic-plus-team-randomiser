@@ -27,7 +27,10 @@ const { teams } = storeToRefs(teamsStore);
 
 function onDrop(event: DragEvent) {
   const characterName = event.dataTransfer?.getData('characterName');
-  const member = filteredMembers.value.find((member) => member.character.name === characterName);
+  const characterRealm = event.dataTransfer?.getData('characterRealm');
+  const member = filteredMembers.value.find(
+    (member) => member.character.name === characterName && member.character.realm === characterRealm
+  );
   if (member) {
     members.add(member);
   } else {

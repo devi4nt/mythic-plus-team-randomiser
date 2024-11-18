@@ -24,7 +24,7 @@ const {
   filter,
   isFetching,
   filteredMembers,
-  selectedNames
+  uniquePlayers
 } = storeToRefs(members);
 
 function startDrag(event: DragEvent, member: Member) {
@@ -33,6 +33,7 @@ function startDrag(event: DragEvent, member: Member) {
     event.dataTransfer.dropEffect = 'move';
     event.dataTransfer.effectAllowed = 'move';
     event.dataTransfer.setData('characterName', member.character.name);
+    event.dataTransfer.setData('characterRealm', member.character.realm);
     emit('dragging', true);
   }
 }
@@ -75,7 +76,9 @@ function handleTap(event: TouchEvent, member: Member) {
     >
       <div
         class="flex justify-between hover:bg-[#454545] cursor-pointer py-1 rounded-sm"
-        :class="{ 'opacity-50': selectedNames.has(member.character.name) }"
+        :class="{
+          'opacity-50': uniquePlayers.has(`${member.character.name}-${member.character.realm}`)
+        }"
         v-for="(member, index) in filteredMembers"
         :key="index"
         :draggable="true"

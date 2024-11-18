@@ -5,7 +5,7 @@ import { XMarkIcon } from '@heroicons/vue/20/solid';
 
 const emit = defineEmits<{
   (event: 'remove'): void;
-  (event: 'swap', swapName?: string, target?: Member): void;
+  (event: 'swap', swapName?: string, swapRealm?: string, target?: Member): void;
 }>();
 
 defineProps<{
@@ -19,11 +19,14 @@ function startDrag(event: DragEvent, member: Member) {
     event.dataTransfer.dropEffect = 'move';
     event.dataTransfer.effectAllowed = 'move';
     event.dataTransfer.setData('characterName', member.character.name);
+    event.dataTransfer.setData('characterRealm', member.character.realm);
   }
 }
 
 function onDrop(event: DragEvent, target: Member) {
-  emit('swap', event.dataTransfer?.getData('characterName'), target);
+  const characterName = event.dataTransfer?.getData('characterName');
+  const characterRealm = event.dataTransfer?.getData('characterRealm');
+  emit('swap', characterName, characterRealm, target);
 }
 </script>
 
