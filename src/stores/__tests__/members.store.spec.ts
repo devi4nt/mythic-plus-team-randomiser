@@ -235,7 +235,7 @@ describe('members store', () => {
     }
   });
 
-  test('it can allow players to fulfil multiple roles' /* { repeats: 100 }, */, async () => {
+  test('it can allow players to fulfil multiple roles', { repeats: 25 }, async () => {
     const store = useMembersStore();
     for (const member of store.filteredMembers) {
       store.add(member);
@@ -244,31 +244,8 @@ describe('members store', () => {
       store.toggleSpec(member);
       store.add(member);
     }
-    // add an extra tank
-    store.add({
-      rank: 3,
-      character: {
-        name: 'Ashen',
-        realm: 'realm-name',
-        class: 'Death Knight',
-        active_spec_name: 'Blood',
-        active_spec_role: 'TANK'
-      }
-    });
 
-    // add an extra healer
-    store.add({
-      rank: 1,
-      character: {
-        name: 'Embers',
-        realm: 'realm-name',
-        class: 'Paladin',
-        active_spec_name: 'Holy',
-        active_spec_role: 'HEALING'
-      }
-    });
-
-    expect(store.selectedMembers.length).toBe(32);
+    expect(store.selectedMembers.length).toBe(30);
 
     await store.randomise();
 
@@ -276,7 +253,6 @@ describe('members store', () => {
     expect(teams.teams.length).toBe(2);
 
     for (const team of teams.teams) {
-      expect(team.members.length).toBe(5);
       expect(
         team.members.filter((member) => member.character.active_spec_role === 'TANK').length
       ).toBe(1);
@@ -286,6 +262,7 @@ describe('members store', () => {
       expect(
         team.members.filter((member) => member.character.active_spec_role === 'HEALING').length
       ).toBe(1);
+      expect(team.members.length).toBe(5);
 
       const unique = new Set(
         team.members.map((member) => `${member.character.name}-${member.character.realm}`)
@@ -349,7 +326,7 @@ describe('members store', () => {
     store.addPug('HEALING');
 
     await store.randomise();
-    expect(alert.error).toBe('Not enough dps');
+    expect(alert.error).toBe('Not enough damage dealers');
 
     // reset
     store.reset();

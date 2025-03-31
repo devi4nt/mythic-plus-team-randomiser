@@ -284,6 +284,36 @@ export const useMembersStore = defineStore('members', () => {
     selectedMembers.value.length = 0;
   }
 
+  function addPugs() {
+    // console.log(`auto pug logic`);
+    // remove existing pugs
+    const currentPugs = selectedMembers.value.filter((member) => member.pug);
+    currentPugs.forEach((member) => remove(member));
+
+    let amount = tanks.value.length;
+    if (Math.ceil(damageDealers.value.length / 3) > amount)
+      amount = Math.ceil(damageDealers.value.length / 3);
+    if (healers.value.length > amount) amount = healers.value.length;
+
+    // add tank pugs
+    let current = tanks.value.length;
+    for (let index = 0; index < amount - current; index++) {
+      addPug('TANK');
+    }
+
+    // add healers
+    current = healers.value.length;
+    for (let index = 0; index < amount - current; index++) {
+      addPug('HEALING');
+    }
+
+    // add dps pugs
+    current = damageDealers.value.length;
+    for (let index = 0; index < amount * 3 - current; index++) {
+      addPug('DPS');
+    }
+  }
+
   async function randomise() {
     teamsStore.reset();
     pickedMembers.value.length = 0;
@@ -291,63 +321,23 @@ export const useMembersStore = defineStore('members', () => {
 
     // auto pug logic
     if (autoPug.value) {
-      // console.log(`auto pug logic`);
-      // remove existing pugs
-      const currentPugs = selectedMembers.value.filter((member) => member.pug);
-      currentPugs.forEach((member) => remove(member));
-
-      let amount = tanks.value.length;
-      if (Math.ceil(damageDealers.value.length / 3) > amount)
-        amount = Math.ceil(damageDealers.value.length / 3);
-      if (healers.value.length > amount) amount = healers.value.length;
-
-      // add tank pugs
-      let current = tanks.value.length;
-      for (let index = 0; index < amount - current; index++) {
-        addPug('TANK');
-      }
-
-      // add dps pugs
-      current = damageDealers.value.length;
-      for (let index = 0; index < amount * 3 - current; index++) {
-        addPug('DPS');
-      }
-
-      // add healers
-      current = healers.value.length;
-      for (let index = 0; index < amount - current; index++) {
-        addPug('HEALING');
-      }
+      addPugs();
     }
+
+    let workingMembers = [...selectedMembers.value];
+    shuffle(workingMembers);
 
     // target number of teams
     const amount = Math.ceil(uniquePlayers.value.size / 5);
-    // console.log(`\n> attempting to randomising ${amount} teams`);
+    console.log(`\n> attempting to randomise ${amount} team(s)`);
 
-    // lust allocation logic
-    let lusts: (Member | undefined)[] = [];
-    if (spreadLust.value) {
-      // console.log(`spreading lust`);
-      // when the captain overlaps with a lust, fill in a blank
-      selectedMembers.value
-        .filter((member) => member.captain && classSpecLust[member.character.class])
-        .forEach(() => {
-          lusts.push(undefined);
-        });
-      const nonCaptainsWithLust = selectedMembers.value.filter(
-        (member) => !member.captain && classSpecLust[member.character.class]
-      );
-      shuffle(nonCaptainsWithLust);
-      for (const member of nonCaptainsWithLust) {
-        if (lusts.length < amount) {
-          lusts.push(member);
-        }
-      }
-      // console.log(`lusts: ${lusts.map((m) => m?.character.name).join(', ')}`);
-    }
+    const workingTeams: Team[] = Array.from({ length: amount }, () => ({
+      id: uuidv4(),
+      members: []
+    }));
 
     // captain allocation logic
-    let captains = selectedMembers.value.filter((member) => member.captain);
+    const captains = workingMembers.filter((member) => member.captain);
     if (captains.length > amount) {
       error.value = 'Too many team captains';
       return;
@@ -356,130 +346,116 @@ export const useMembersStore = defineStore('members', () => {
     //   console.log(`captains: ${captains.map((m) => m?.character.name).join(', ')}`);
     // }
 
-    let workingMembers = [...selectedMembers.value];
-
-    /* remove already picked members, lusts and captains */
-    function pruneWorkingMembers(name: string, realm: string) {
-      workingMembers = workingMembers.filter(
-        (m) => name !== m.character.name || realm !== m.character.realm
+    // lust allocation logic
+    const lusts: (Member | undefined)[] = [];
+    if (spreadLust.value) {
+      // console.log(`spreading lust`);
+      // when the captain overlaps with a lust, fill in a blank
+      workingMembers
+        .filter((member) => member.captain && classSpecLust[member.character.class])
+        .forEach(() => {
+          lusts.push(undefined);
+        });
+      const nonCaptainsWithLust = workingMembers.filter(
+        (member) => !member.captain && classSpecLust[member.character.class]
       );
-      lusts = lusts.filter((m) => name !== m?.character.name || realm !== m?.character.realm);
-      captains = captains.filter((m) => name !== m.character.name || realm !== m.character.realm);
+      shuffle(nonCaptainsWithLust);
+      for (const member of nonCaptainsWithLust) {
+        if (lusts.length < amount) {
+          lusts.push(member);
+        }
+      }
+      console.log(`lusts: ${lusts.map((m) => m?.character.name).join(', ')}`);
     }
 
-    for (let index = 0; index < amount; index++) {
-      // console.log(`randomising team ${index + 1}`);
-      const members: Member[] = [];
-      shuffle(workingMembers); // shuffle eligible members
+    /* prune picked characters */
+    function pruneWorkingMembers(member: Member) {
+      workingMembers = workingMembers.filter(
+        (m) =>
+          member.character.name !== m.character.name || member.character.realm !== m.character.realm
+      );
+    }
 
+    for (const team of workingTeams) {
+      // assign captains
       const captain = captains.shift();
-      // if (captain) {
-      //   console.log(
-      //     `captain: ${captain.character.name} role: ${captain.character.active_spec_role}`
-      //   );
-      // }
-
+      if (captain) {
+        pruneWorkingMembers(captain);
+        team.members.push(captain);
+      }
+      // assign lusts
       const lust = lusts.shift();
       if (lust) {
-        // console.log(`lust: ${lust.character.name} role: ${lust.character.active_spec_role}`);
-        pruneWorkingMembers(lust.character.name, lust.character.realm);
+        pruneWorkingMembers(lust);
+        team.members.push(lust);
       }
-      // if (lust) {
-      //   workingMembers.unshift(lust);
-      // }
+    }
 
-      const tank =
-        captain?.character.active_spec_role === 'TANK'
-          ? captain
-          : workingMembers.find((member) => member.character.active_spec_role === 'TANK');
-      if (!tank) {
-        if (!teams.value.length) {
-          // console.error(`not enough tanks`);
-          error.value = 'Not enough tanks';
-        }
-        break;
-      }
-      members.push(tank);
-      pruneWorkingMembers(tank.character.name, tank.character.realm);
+    const isTank = (member: Member) => member.character.active_spec_role === 'TANK';
+    const isHealer = (member: Member) => member.character.active_spec_role === 'HEALING';
+    const isDamageDealer = (member: Member) => member.character.active_spec_role === 'DPS';
 
-      const dps: Member[] = [];
-      if (captain?.character.active_spec_role === 'DPS') {
-        dps.push(captain);
-      } else if (lust?.character.active_spec_role === 'DPS') {
-        dps.push(lust);
+    // assign tanks
+    for (const team of workingTeams) {
+      // skip if team captain was a tank
+      if (team.members.find(isTank)) continue;
+      const tank = workingMembers.find(isTank);
+      if (tank) {
+        pruneWorkingMembers(tank);
+        team.members.push(tank);
       }
-      if (dps.length) {
-        pruneWorkingMembers(dps[0].character.name, dps[0].character.realm);
-      }
+    }
 
-      for (const member of workingMembers
-        .sort((a, b) => {
-          if (classSpecLust[a.character.class] === classSpecLust[b.character.class]) return 0;
-          return classSpecLust[a.character.class] ? 1 : -1;
-        })
-        .filter((m) => m.character.active_spec_role === 'DPS')) {
-        if (
-          dps.find(
-            (d) =>
-              d.character.name === member.character.name &&
-              d.character.realm === member.character.realm
-          )
-        )
-          continue;
-        dps.push(member);
-        pruneWorkingMembers(member.character.name, member.character.realm);
-        if (dps.length === 3) {
-          break;
+    // assign healers
+    for (const team of workingTeams) {
+      // skip if team captain / lust was a healer
+      if (team.members.find(isHealer)) continue;
+      const healer = workingMembers.find(isHealer);
+      if (healer) {
+        pruneWorkingMembers(healer);
+        team.members.push(healer);
+      }
+    }
+
+    // assign damage dealers
+    for (const team of workingTeams) {
+      for (let i = 0; i < 3; i++) {
+        if (team.members.filter(isDamageDealer).length === 3) continue;
+        const dps = workingMembers.find(isDamageDealer);
+        if (dps) {
+          pruneWorkingMembers(dps);
+          team.members.push(dps);
         }
       }
-      if (dps.length < 3) {
-        if (!teams.value.length) {
-          // console.error(`not enough dps`);
-          error.value = 'Not enough dps';
-        }
-        break;
-      }
-      members.push(...dps);
+    }
 
-      const healer =
-        captain?.character.active_spec_role === 'HEALING'
-          ? captain
-          : lust?.character.active_spec_role === 'HEALING'
-            ? lust
-            : workingMembers
-                .sort((a, b) => {
-                  if (classSpecLust[a.character.class] === classSpecLust[b.character.class])
-                    return 0;
-                  return classSpecLust[a.character.class] ? 1 : -1;
-                })
-                .find((member) => member.character.active_spec_role === 'HEALING');
-      if (!healer) {
-        if (!teams.value.length) {
-          // console.error(`not enough healers`);
-          error.value = 'Not enough healers';
-        }
-        break;
-      }
-      members.push(healer);
-      pruneWorkingMembers(healer.character.name, healer.character.realm);
+    const roleOrder = { TANK: 1, DPS: 2, HEALING: 3 };
 
-      pickedMembers.value.push(...members);
-      // console.log(
-      //   `team members: ${members
-      //     .map((member) => `${member.character.name} [${member.character.active_spec_role}]`)
-      //     .join(', ')}`
-      // );
-      const team: Team = {
-        id: uuidv4(),
-        members
-      };
-      await teamsStore.add(team);
+    for (const team of workingTeams) {
+      console.log(team.members.map((m) => m.character.name));
+      team.members = team.members.sort((a, b) => {
+        return roleOrder[a.character.active_spec_role] - roleOrder[b.character.active_spec_role];
+      });
+      if (team.members.length === 5) {
+        await teamsStore.add(team);
+      }
+    }
+
+    // see why we have no teams
+    if (teams.value.length === 0 && workingTeams.length) {
+      const team = workingTeams.shift();
+      if (!team?.members.find(isTank)) {
+        error.value = 'Not enough tanks';
+      } else if (!team?.members.find(isHealer)) {
+        error.value = 'Not enough healers';
+      } else if (team.members.filter(isDamageDealer).length !== 3) {
+        error.value = 'Not enough damage dealers';
+      }
     }
 
     if (!error.value) {
-      const roundedAmount = Math.floor(amount);
-      const playersLeft = uniquePlayers.value.size - teams.value.length * 5;
-      if (amount !== roundedAmount || teams.value.length !== roundedAmount) {
+      if (teams.value.length !== amount) {
+        const playersLeft = uniquePlayers.value.size - teams.value.length * 5;
         warning.value = `Too few eligible players to assign all roles ${teams.value.length} teams created, ${playersLeft} players left`;
       } else {
         success.value = 'Teams successfully randomised';
