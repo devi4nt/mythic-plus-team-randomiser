@@ -359,4 +359,165 @@ describe('members store', () => {
       `Too few eligible players to assign all roles 1 teams created, 4 players left`
     );
   });
+
+  test('it correctly distributes Lust providers to avoid role collisions', async () => {
+    const store = useMembersStore();
+    const config = useConfigStore();
+    const teams = useTeamsStore();
+
+    // Setup for collision scenario
+    config.spreadLust = true;
+    config.autoPug = false;
+    config.fancy = false;
+
+    const mockConflictMembers: Member[] = [
+      // Team 1 Captain (Healer)
+      {
+        character: {
+          name: 'CaptainHealer',
+          class: 'Priest',
+          active_spec_name: 'Holy',
+          active_spec_role: 'HEALING',
+          realm: 'Test'
+        },
+        captain: true,
+        rank: 1
+      },
+      // Team 2 Captain (DPS)
+      {
+        character: {
+          name: 'CaptainDPS',
+          class: 'Warrior',
+          active_spec_name: 'Arms',
+          active_spec_role: 'DPS',
+          realm: 'Test'
+        },
+        captain: true,
+        rank: 1
+      },
+      // Lust Provider (Healer)
+      {
+        character: {
+          name: 'LustHealer',
+          class: 'Shaman',
+          active_spec_name: 'Restoration',
+          active_spec_role: 'HEALING',
+          realm: 'Test'
+        },
+        captain: false,
+        rank: 1
+      },
+      // Lust Provider (DPS)
+      {
+        character: {
+          name: 'LustDPS',
+          class: 'Mage',
+          active_spec_name: 'Fire',
+          active_spec_role: 'DPS',
+          realm: 'Test'
+        },
+        captain: false,
+        rank: 1
+      },
+      // Fillers
+      {
+        character: {
+          name: 'Tank1',
+          class: 'Warrior',
+          active_spec_name: 'Protection',
+          active_spec_role: 'TANK',
+          realm: 'Test'
+        },
+        captain: false,
+        rank: 1
+      },
+      {
+        character: {
+          name: 'Tank2',
+          class: 'Warrior',
+          active_spec_name: 'Protection',
+          active_spec_role: 'TANK',
+          realm: 'Test'
+        },
+        captain: false,
+        rank: 1
+      },
+      {
+        character: {
+          name: 'DPS1',
+          class: 'Rogue',
+          active_spec_name: 'Outlaw',
+          active_spec_role: 'DPS',
+          realm: 'Test'
+        },
+        captain: false,
+        rank: 1
+      },
+      {
+        character: {
+          name: 'DPS2',
+          class: 'Rogue',
+          active_spec_name: 'Outlaw',
+          active_spec_role: 'DPS',
+          realm: 'Test'
+        },
+        captain: false,
+        rank: 1
+      },
+      {
+        character: {
+          name: 'DPS3',
+          class: 'Rogue',
+          active_spec_name: 'Outlaw',
+          active_spec_role: 'DPS',
+          realm: 'Test'
+        },
+        captain: false,
+        rank: 1
+      },
+      {
+        character: {
+          name: 'DPS4',
+          class: 'Rogue',
+          active_spec_name: 'Outlaw',
+          active_spec_role: 'DPS',
+          realm: 'Test'
+        },
+        captain: false,
+        rank: 1
+      }
+    ];
+
+    store.selectedMembers = mockConflictMembers;
+
+    // Run multiple times to ensure stability
+    for (let i = 0; i < 10; i++) {
+      await store.randomise();
+      expect(teams.teams.length).toBe(2);
+      // Verify captains and lusts
+      const teamWithHealerCaptain = teams.teams.find((t) =>
+        t.members.find((m) => m.character.name === 'CaptainHealer')
+      );
+      const teamWithDPSCaptain = teams.teams.find((t) =>
+        t.members.find((m) => m.character.name === 'CaptainDPS')
+      );
+
+      expect(teamWithHealerCaptain).toBeDefined();
+      expect(teamWithDPSCaptain).toBeDefined();
+
+      if (teamWithHealerCaptain && teamWithDPSCaptain) {
+        // Healer Captain MUST get DPS Lust
+        const lust1 = teamWithHealerCaptain.members.find((m) =>
+          m.character.name.startsWith('Lust')
+        );
+        expect(lust1?.character.active_spec_role).toBe('DPS');
+        expect(lust1?.character.name).toBe('LustDPS');
+
+        // DPS Captain gets Healer Lust (in this closed system)
+        const lust2 = teamWithDPSCaptain.members.find((m) => m.character.name.startsWith('Lust'));
+        expect(lust2?.character.active_spec_role).toBe('HEALING');
+        expect(lust2?.character.name).toBe('LustHealer');
+      }
+    }
+  });
 });
