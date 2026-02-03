@@ -338,6 +338,15 @@ export const useMembersStore = defineStore('members', () => {
 
     // captain allocation logic
     const captains = workingMembers.filter((member) => member.captain);
+
+    // Sort captains to prioritize hard-to-fill roles (Healer/Tank) first for Lust allocation
+    const rolePriority: Record<string, number> = { HEALING: 0, TANK: 1, DPS: 2 };
+    captains.sort((a, b) => {
+      const pA = rolePriority[a.character.active_spec_role] ?? 2;
+      const pB = rolePriority[b.character.active_spec_role] ?? 2;
+      return pA - pB;
+    });
+
     if (captains.length > amount) {
       error.value = 'Too many team captains';
       return;
@@ -345,28 +354,6 @@ export const useMembersStore = defineStore('members', () => {
     // if (captains.length) {
     //   console.log(`captains: ${captains.map((m) => m?.character.name).join(', ')}`);
     // }
-
-    // lust allocation logic
-    const lusts: (Member | undefined)[] = [];
-    if (spreadLust.value) {
-      // console.log(`spreading lust`);
-      // when the captain overlaps with a lust, fill in a blank
-      workingMembers
-        .filter((member) => member.captain && classSpecLust[member.character.class])
-        .forEach(() => {
-          lusts.push(undefined);
-        });
-      const nonCaptainsWithLust = workingMembers.filter(
-        (member) => !member.captain && classSpecLust[member.character.class]
-      );
-      shuffle(nonCaptainsWithLust);
-      for (const member of nonCaptainsWithLust) {
-        if (lusts.length < amount) {
-          lusts.push(member);
-        }
-      }
-      console.log(`lusts: ${lusts.map((m) => m?.character.name).join(', ')}`);
-    }
 
     /* prune picked characters */
     function pruneWorkingMembers(member: Member) {
@@ -376,6 +363,16 @@ export const useMembersStore = defineStore('members', () => {
       );
     }
 
+    const isTank = (member: Member) => member.character.active_spec_role === 'TANK';
+    const isHealer = (member: Member) => member.character.active_spec_role === 'HEALING';
+    const isDamageDealer = (member: Member) => member.character.active_spec_role === 'DPS';
+
+    // lust allocation logic
+    const availableLustProviders = workingMembers.filter(
+      (member) => !member.captain && classSpecLust[member.character.class]
+    );
+    shuffle(availableLustProviders);
+
     for (const team of workingTeams) {
       // assign captains
       const captain = captains.shift();
@@ -383,17 +380,35 @@ export const useMembersStore = defineStore('members', () => {
         pruneWorkingMembers(captain);
         team.members.push(captain);
       }
+
       // assign lusts
-      const lust = lusts.shift();
-      if (lust) {
-        pruneWorkingMembers(lust);
-        team.members.push(lust);
+      if (spreadLust.value) {
+        const captainHasLust = team.members.some((m) => classSpecLust[m.character.class]);
+        if (!captainHasLust) {
+          // pick a lust provider
+          // Try to find one that doesn't conflict with captain's role (specifically Healer/Tank)
+          let providerIndex = availableLustProviders.findIndex((m) => {
+            // If team has Healer, avoid Healer Lust
+            if (team.members.find(isHealer) && isHealer(m)) return false;
+            // If team has Tank, avoid Tank Lust (though none exist currently)
+            if (team.members.find(isTank) && isTank(m)) return false;
+            return true;
+          });
+
+          // If no optimal provider found, take the first one (fallback)
+          if (providerIndex === -1 && availableLustProviders.length > 0) {
+            providerIndex = 0;
+          }
+
+          if (providerIndex !== -1) {
+            const lust = availableLustProviders[providerIndex];
+            pruneWorkingMembers(lust);
+            team.members.push(lust);
+            availableLustProviders.splice(providerIndex, 1);
+          }
+        }
       }
     }
-
-    const isTank = (member: Member) => member.character.active_spec_role === 'TANK';
-    const isHealer = (member: Member) => member.character.active_spec_role === 'HEALING';
-    const isDamageDealer = (member: Member) => member.character.active_spec_role === 'DPS';
 
     // assign tanks
     for (const team of workingTeams) {
