@@ -5,7 +5,7 @@ describe('pause', () => {
   it('resolves after the specified duration', async () => {
     vi.useFakeTimers();
     let resolved = false;
-    pause(1000).then(() => {
+    void pause(1000).then(() => {
       resolved = true;
     });
 
