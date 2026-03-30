@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vite-plus/test';
 
 import { mount } from '@vue/test-utils';
 import Alert from '../Alert.vue';
@@ -35,5 +35,21 @@ describe('Alert', () => {
     });
     expect(wrapper.text()).toContain('ERROR');
     expect(wrapper.classes()).toContain('bg-red-600');
+  });
+
+  it('fades out after timeout', async () => {
+    vi.useFakeTimers();
+    const wrapper = mount(Alert, {
+      props: { type: 'info', timeout: 3000 },
+      slots: { default: ['TIMED'] }
+    });
+
+    expect(wrapper.classes()).toContain('opacity-100');
+
+    vi.advanceTimersByTime(3000);
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.classes()).toContain('opacity-0');
+    vi.useRealTimers();
   });
 });

@@ -1,6 +1,6 @@
-import { expect } from 'vitest';
+import { expect } from 'vite-plus/test';
 import { setActivePinia, createPinia } from 'pinia';
-import { describe, test, beforeEach, afterEach, vi } from 'vitest';
+import { describe, test, beforeEach, afterEach, vi } from 'vite-plus/test';
 import { useMembersStore } from '../members.store';
 import { useConfigStore } from '../config.store';
 import { useTeamsStore } from '../teams.store';
