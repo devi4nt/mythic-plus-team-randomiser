@@ -1,6 +1,6 @@
-import { expect } from 'vitest';
+import { expect } from 'vite-plus/test';
 import { setActivePinia, createPinia, storeToRefs } from 'pinia';
-import { describe, test, beforeEach, afterEach, vi } from 'vitest';
+import { describe, test, beforeEach, afterEach, vi } from 'vite-plus/test';
 import { useAlertStore } from '../alert.store';
 import { nextTick } from 'vue';
 

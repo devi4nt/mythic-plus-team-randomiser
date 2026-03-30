@@ -45,7 +45,7 @@ export const useMembersStore = defineStore('members', () => {
       if (code === 400) {
         fatal.value =
           'Could not find requested guild, please double check the guild name, realm and try again.';
-      } else if (/^2/.test(String(code))) {
+      } else if (String(code).startsWith('2')) {
         fatal.value = undefined;
       }
     },
