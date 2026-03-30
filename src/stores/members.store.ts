@@ -351,9 +351,9 @@ export const useMembersStore = defineStore('members', () => {
       error.value = 'Too many team captains';
       return;
     }
-    // if (captains.length) {
-    //   console.log(`captains: ${captains.map((m) => m?.character.name).join(', ')}`);
-    // }
+    if (captains.length) {
+      console.log(`captains: ${captains.map((m) => m?.character.name).join(', ')}`);
+    }
 
     /* prune picked characters */
     function pruneWorkingMembers(member: Member) {
@@ -367,10 +367,19 @@ export const useMembersStore = defineStore('members', () => {
     const isHealer = (member: Member) => member.character.active_spec_role === 'HEALING';
     const isDamageDealer = (member: Member) => member.character.active_spec_role === 'DPS';
 
-    // lust allocation logic
-    const availableLustProviders = workingMembers.filter(
-      (member) => !member.captain && classSpecLust[member.character.class]
-    );
+    // lust allocation logic - deduplicate by player, preferring healer entries
+    // Using a healer entry as lust fills both the lust and healer slot,
+    // preventing healer pool depletion when multi-spec players are selected
+    const lustProviderMap = new Map<string, Member>();
+    for (const member of workingMembers) {
+      if (member.captain || !classSpecLust[member.character.class]) continue;
+      const key = `${member.character.name}-${member.character.realm}`;
+      const existing = lustProviderMap.get(key);
+      if (!existing || (isHealer(member) && !isHealer(existing))) {
+        lustProviderMap.set(key, member);
+      }
+    }
+    const availableLustProviders = [...lustProviderMap.values()];
     shuffle(availableLustProviders);
 
     for (const team of workingTeams) {
@@ -387,18 +396,13 @@ export const useMembersStore = defineStore('members', () => {
         if (!captainHasLust) {
           // pick a lust provider
           // Try to find one that doesn't conflict with captain's role (specifically Healer/Tank)
-          let providerIndex = availableLustProviders.findIndex((m) => {
+          const providerIndex = availableLustProviders.findIndex((m) => {
             // If team has Healer, avoid Healer Lust
             if (team.members.find(isHealer) && isHealer(m)) return false;
             // If team has Tank, avoid Tank Lust (though none exist currently)
             if (team.members.find(isTank) && isTank(m)) return false;
             return true;
           });
-
-          // If no optimal provider found, take the first one (fallback)
-          if (providerIndex === -1 && availableLustProviders.length > 0) {
-            providerIndex = 0;
-          }
 
           if (providerIndex !== -1) {
             const lust = availableLustProviders[providerIndex];
