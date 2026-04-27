@@ -1,31 +1,31 @@
 export type ClassType =
-  | 'Priest'
-  | 'Warrior'
-  | 'Mage'
-  | 'Rogue'
-  | 'Hunter'
-  | 'Warlock'
-  | 'Shaman'
-  | 'Druid'
-  | 'Paladin'
-  | 'Demon Hunter'
-  | 'Death Knight'
-  | 'Monk'
-  | 'Evoker';
+  | "Priest"
+  | "Warrior"
+  | "Mage"
+  | "Rogue"
+  | "Hunter"
+  | "Warlock"
+  | "Shaman"
+  | "Druid"
+  | "Paladin"
+  | "Demon Hunter"
+  | "Death Knight"
+  | "Monk"
+  | "Evoker";
 
-export type PriestClassSpec = 'Holy' | 'Discipline' | 'Shadow';
-export type WarriorClassSpec = 'Arms' | 'Fury' | 'Protection';
-export type MageClassSpec = 'Fire' | 'Frost' | 'Arcane';
-export type RogueClassSpec = 'Subtlety' | 'Outlaw' | 'Assassination';
-export type HunterClassSpec = 'Beast Mastery' | 'Marksmanship' | 'Survival';
-export type WarlockClassSpec = 'Affliction' | 'Demonology' | 'Destruction';
-export type ShamanClassSpec = 'Elemental' | 'Enhancement' | 'Restoration';
-export type DruidClassSpec = 'Restoration' | 'Balance' | 'Feral' | 'Guardian';
-export type PaladinClassSpec = 'Protection' | 'Retribution' | 'Holy';
-export type DemonHunterClassSpec = 'Vengeance' | 'Havoc';
-export type DeathKnightClassSpec = 'Blood' | 'Unholy' | 'Frost';
-export type MonkClassSpec = 'Windwalker' | 'Brewmaster' | 'Mistweaver';
-export type EvokerClassSpec = 'Devastation' | 'Preservation' | 'Augmentation';
+export type PriestClassSpec = "Holy" | "Discipline" | "Shadow";
+export type WarriorClassSpec = "Arms" | "Fury" | "Protection";
+export type MageClassSpec = "Fire" | "Frost" | "Arcane";
+export type RogueClassSpec = "Subtlety" | "Outlaw" | "Assassination";
+export type HunterClassSpec = "Beast Mastery" | "Marksmanship" | "Survival";
+export type WarlockClassSpec = "Affliction" | "Demonology" | "Destruction";
+export type ShamanClassSpec = "Elemental" | "Enhancement" | "Restoration";
+export type DruidClassSpec = "Restoration" | "Balance" | "Feral" | "Guardian";
+export type PaladinClassSpec = "Protection" | "Retribution" | "Holy";
+export type DemonHunterClassSpec = "Vengeance" | "Havoc" | "Devourer";
+export type DeathKnightClassSpec = "Blood" | "Unholy" | "Frost";
+export type MonkClassSpec = "Windwalker" | "Brewmaster" | "Mistweaver";
+export type EvokerClassSpec = "Devastation" | "Preservation" | "Augmentation";
 
 export type ClassSpec =
   | PriestClassSpec
@@ -42,8 +42,8 @@ export type ClassSpec =
   | MonkClassSpec
   | EvokerClassSpec;
 
-export type ClassRole = 'DPS' | 'TANK' | 'HEALING';
-export type ClassFilter = ClassRole | 'ALL';
+export type ClassRole = "DPS" | "TANK" | "HEALING";
+export type ClassFilter = ClassRole | "ALL";
 
 export interface Character {
   name: string;
@@ -51,8 +51,8 @@ export interface Character {
   class: ClassType;
   active_spec_name: ClassSpec;
   active_spec_role: ClassRole;
-  gender?: 'male' | 'female';
-  faction?: 'horde' | 'alliance';
+  gender?: "male" | "female";
+  faction?: "horde" | "alliance";
   achievement_points?: number;
   honorable_kills?: number;
   region?: Lowercase<Region>;
@@ -88,11 +88,11 @@ export interface Member {
 }
 
 export interface IAlert {
-  type: 'error' | 'warning' | 'success';
+  type: "error" | "warning" | "success";
   message: string;
 }
 
-export type Region = 'CN' | 'EU' | 'KR' | 'TW' | 'US';
+export type Region = "CN" | "EU" | "KR" | "TW" | "US";
 
 export interface IRegion {
   value: Region;
