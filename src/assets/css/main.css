@@ -13,7 +13,7 @@ body {
 
 .spec_death-knight_blood,
 .spec_death-knight_frost {
-  background-image: url(../images/specs.png);
+  background-image: url("../images/specs.png");
   height: 64px;
   width: 64px;
 }
@@ -27,296 +27,303 @@ body {
 }
 
 .spec_death-knight_unholy,
-.spec_demon-hunter_havoc {
-  background-image: url(../images/specs.png);
+.spec_demon-hunter_devourer {
+  background-image: url("../images/specs.png");
   height: 64px;
   width: 64px;
 }
 
-.spec_demon-hunter_havoc {
+.spec_demon-hunter_devourer {
   background-position: -64px -64px;
 }
 
-.spec_demon-hunter_vengeance {
+.spec_demon-hunter_havoc {
   background-position: -128px 0;
 }
 
-.spec_demon-hunter_vengeance,
-.spec_druid_balance {
-  background-image: url(../images/specs.png);
+.spec_demon-hunter_havoc,
+.spec_demon-hunter_vengeance {
+  background-image: url("../images/specs.png");
   height: 64px;
   width: 64px;
 }
 
-.spec_druid_balance {
+.spec_demon-hunter_vengeance {
   background-position: -128px -64px;
 }
 
-.spec_druid_feral {
+.spec_druid_balance {
   background-position: 0 -128px;
 }
 
-.spec_druid_feral,
-.spec_druid_guardian {
-  background-image: url(../images/specs.png);
+.spec_druid_balance,
+.spec_druid_feral {
+  background-image: url("../images/specs.png");
   height: 64px;
   width: 64px;
 }
 
-.spec_druid_guardian {
+.spec_druid_feral {
   background-position: -64px -128px;
 }
 
-.spec_druid_restoration {
+.spec_druid_guardian {
   background-position: -128px -128px;
 }
 
-.spec_druid_restoration,
-.spec_evoker_augmentation {
-  background-image: url(../images/specs.png);
+.spec_druid_guardian,
+.spec_druid_restoration {
+  background-image: url("../images/specs.png");
   height: 64px;
   width: 64px;
 }
 
-.spec_evoker_augmentation {
+.spec_druid_restoration {
   background-position: -192px 0;
 }
 
-.spec_evoker_devastation {
+.spec_evoker_augmentation {
   background-position: -192px -64px;
 }
 
-.spec_evoker_devastation,
-.spec_evoker_preservation {
-  background-image: url(../images/specs.png);
+.spec_evoker_augmentation,
+.spec_evoker_devastation {
+  background-image: url("../images/specs.png");
   height: 64px;
   width: 64px;
 }
 
-.spec_evoker_preservation {
+.spec_evoker_devastation {
   background-position: -192px -128px;
 }
 
-.spec_hunter_beast-mastery {
+.spec_evoker_preservation {
   background-position: 0 -192px;
 }
 
-.spec_hunter_beast-mastery,
-.spec_hunter_marksmanship {
-  background-image: url(../images/specs.png);
+.spec_evoker_preservation,
+.spec_hunter_beast-mastery {
+  background-image: url("../images/specs.png");
   height: 64px;
   width: 64px;
 }
 
-.spec_hunter_marksmanship {
+.spec_hunter_beast-mastery {
   background-position: -64px -192px;
 }
 
-.spec_hunter_survival {
+.spec_hunter_marksmanship {
   background-position: -128px -192px;
 }
 
-.spec_hunter_survival,
-.spec_mage_arcane {
-  background-image: url(../images/specs.png);
+.spec_hunter_marksmanship,
+.spec_hunter_survival {
+  background-image: url("../images/specs.png");
   height: 64px;
   width: 64px;
 }
 
-.spec_mage_arcane {
+.spec_hunter_survival {
   background-position: -192px -192px;
 }
 
-.spec_mage_fire {
+.spec_mage_arcane {
   background-position: -256px 0;
 }
 
-.spec_mage_fire,
-.spec_mage_frost {
-  background-image: url(../images/specs.png);
+.spec_mage_arcane,
+.spec_mage_fire {
+  background-image: url("../images/specs.png");
   height: 64px;
   width: 64px;
 }
 
-.spec_mage_frost {
+.spec_mage_fire {
   background-position: -256px -64px;
 }
 
-.spec_monk_brewmaster {
+.spec_mage_frost {
   background-position: -256px -128px;
 }
 
-.spec_monk_brewmaster,
-.spec_monk_mistweaver {
-  background-image: url(../images/specs.png);
+.spec_mage_frost,
+.spec_monk_brewmaster {
+  background-image: url("../images/specs.png");
   height: 64px;
   width: 64px;
 }
 
-.spec_monk_mistweaver {
+.spec_monk_brewmaster {
   background-position: -256px -192px;
 }
 
-.spec_monk_windwalker {
+.spec_monk_mistweaver {
   background-position: 0 -256px;
 }
 
-.spec_monk_windwalker,
-.spec_paladin_holy {
-  background-image: url(../images/specs.png);
+.spec_monk_mistweaver,
+.spec_monk_windwalker {
+  background-image: url("../images/specs.png");
   height: 64px;
   width: 64px;
 }
 
-.spec_paladin_holy {
+.spec_monk_windwalker {
   background-position: -64px -256px;
 }
 
-.spec_paladin_protection {
+.spec_paladin_holy {
   background-position: -128px -256px;
 }
 
-.spec_paladin_protection,
-.spec_paladin_retribution {
-  background-image: url(../images/specs.png);
+.spec_paladin_holy,
+.spec_paladin_protection {
+  background-image: url("../images/specs.png");
   height: 64px;
   width: 64px;
 }
 
-.spec_paladin_retribution {
+.spec_paladin_protection {
   background-position: -192px -256px;
 }
 
-.spec_priest_discipline {
+.spec_paladin_retribution {
   background-position: -256px -256px;
 }
 
-.spec_priest_discipline,
-.spec_priest_holy {
-  background-image: url(../images/specs.png);
+.spec_paladin_retribution,
+.spec_priest_discipline {
+  background-image: url("../images/specs.png");
   height: 64px;
   width: 64px;
 }
 
-.spec_priest_holy {
+.spec_priest_discipline {
   background-position: -320px 0;
 }
 
-.spec_priest_shadow {
+.spec_priest_holy {
   background-position: -320px -64px;
 }
 
-.spec_priest_shadow,
-.spec_rogue_assassination {
-  background-image: url(../images/specs.png);
+.spec_priest_holy,
+.spec_priest_shadow {
+  background-image: url("../images/specs.png");
   height: 64px;
   width: 64px;
 }
 
-.spec_rogue_assassination {
+.spec_priest_shadow {
   background-position: -320px -128px;
 }
 
-.spec_rogue_combat {
+.spec_rogue_assassination {
   background-position: -320px -192px;
 }
 
-.spec_rogue_combat,
-.spec_rogue_outlaw {
-  background-image: url(../images/specs.png);
+.spec_rogue_assassination,
+.spec_rogue_combat {
+  background-image: url("../images/specs.png");
   height: 64px;
   width: 64px;
 }
 
-.spec_rogue_outlaw {
+.spec_rogue_combat {
   background-position: -320px -256px;
 }
 
-.spec_rogue_subtlety {
+.spec_rogue_outlaw {
   background-position: 0 -320px;
 }
 
-.spec_rogue_subtlety,
-.spec_shaman_elemental {
-  background-image: url(../images/specs.png);
+.spec_rogue_outlaw,
+.spec_rogue_subtlety {
+  background-image: url("../images/specs.png");
   height: 64px;
   width: 64px;
 }
 
-.spec_shaman_elemental {
+.spec_rogue_subtlety {
   background-position: -64px -320px;
 }
 
-.spec_shaman_enhancement {
+.spec_shaman_elemental {
   background-position: -128px -320px;
 }
 
-.spec_shaman_enhancement,
-.spec_shaman_restoration {
-  background-image: url(../images/specs.png);
+.spec_shaman_elemental,
+.spec_shaman_enhancement {
+  background-image: url("../images/specs.png");
   height: 64px;
   width: 64px;
 }
 
-.spec_shaman_restoration {
+.spec_shaman_enhancement {
   background-position: -192px -320px;
 }
 
-.spec_warlock_affliction {
+.spec_shaman_restoration {
   background-position: -256px -320px;
 }
 
-.spec_warlock_affliction,
-.spec_warlock_demonology {
-  background-image: url(../images/specs.png);
+.spec_shaman_restoration,
+.spec_warlock_affliction {
+  background-image: url("../images/specs.png");
   height: 64px;
   width: 64px;
 }
 
-.spec_warlock_demonology {
+.spec_warlock_affliction {
   background-position: -320px -320px;
 }
 
-.spec_warlock_destruction {
+.spec_warlock_demonology {
   background-position: -384px 0;
 }
 
-.spec_warlock_destruction,
-.spec_warrior_arms {
-  background-image: url(../images/specs.png);
+.spec_warlock_demonology,
+.spec_warlock_destruction {
+  background-image: url("../images/specs.png");
   height: 64px;
   width: 64px;
 }
 
-.spec_warrior_arms {
+.spec_warlock_destruction {
   background-position: -384px -64px;
 }
 
-.spec_warrior_fury {
+.spec_warrior_arms {
   background-position: -384px -128px;
 }
 
-.spec_warrior_fury,
-.spec_warrior_protection {
-  background-image: url(../images/specs.png);
+.spec_warrior_arms,
+.spec_warrior_fury {
+  background-image: url("../images/specs.png");
   height: 64px;
   width: 64px;
 }
 
-.spec_warrior_protection {
+.spec_warrior_fury {
   background-position: -384px -192px;
 }
 
+.spec_warrior_protection {
+  background-image: url("../images/specs.png");
+  background-position: -384px -256px;
+  height: 64px;
+  width: 64px;
+}
 /* end spec specific */
 
 /* start class specific */
+
 .class_death-knight {
   background-position: 0 0;
 }
 
 .class_death-knight,
 .class_demon-hunter {
-  background-image: url(../images/classes.png);
+  background-image: url("../images/classes.png");
   height: 64px;
   width: 64px;
 }
@@ -331,7 +338,7 @@ body {
 
 .class_druid,
 .class_evoker {
-  background-image: url(../images/classes.png);
+  background-image: url("../images/classes.png");
   height: 64px;
   width: 64px;
 }
@@ -346,7 +353,7 @@ body {
 
 .class_hunter,
 .class_mage {
-  background-image: url(../images/classes.png);
+  background-image: url("../images/classes.png");
   height: 64px;
   width: 64px;
 }
@@ -361,7 +368,7 @@ body {
 
 .class_monk,
 .class_paladin {
-  background-image: url(../images/classes.png);
+  background-image: url("../images/classes.png");
   height: 64px;
   width: 64px;
 }
@@ -376,7 +383,7 @@ body {
 
 .class_priest,
 .class_rogue {
-  background-image: url(../images/classes.png);
+  background-image: url("../images/classes.png");
   height: 64px;
   width: 64px;
 }
@@ -391,7 +398,7 @@ body {
 
 .class_shaman,
 .class_warlock {
-  background-image: url(../images/classes.png);
+  background-image: url("../images/classes.png");
   height: 64px;
   width: 64px;
 }
@@ -401,7 +408,7 @@ body {
 }
 
 .class_warrior {
-  background-image: url(../images/classes.png);
+  background-image: url("../images/classes.png");
   background-position: 0 -192px;
   height: 64px;
   width: 64px;
