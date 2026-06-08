@@ -367,56 +367,34 @@ export const useMembersStore = defineStore('members', () => {
     const isHealer = (member: Member) => member.character.active_spec_role === 'HEALING';
     const isDamageDealer = (member: Member) => member.character.active_spec_role === 'DPS';
 
-    // lust allocation logic - deduplicate by player, preferring healer entries
-    // Using a healer entry as lust fills both the lust and healer slot,
-    // preventing healer pool depletion when multi-spec players are selected
-    const lustProviderMap = new Map<string, Member>();
-    for (const member of workingMembers) {
-      if (member.captain || !classSpecLust[member.character.class]) continue;
-      const key = `${member.character.name}-${member.character.realm}`;
-      const existing = lustProviderMap.get(key);
-      if (!existing || (isHealer(member) && !isHealer(existing))) {
-        lustProviderMap.set(key, member);
-      }
-    }
-    const availableLustProviders = [...lustProviderMap.values()];
-    shuffle(availableLustProviders);
+    const hasLust = (team: Team) => team.members.some((m) => classSpecLust[m.character.class]);
 
+    // assign captains - one per team
     for (const team of workingTeams) {
-      // assign captains
       const captain = captains.shift();
       if (captain) {
         pruneWorkingMembers(captain);
         team.members.push(captain);
       }
-
-      // assign lusts
-      if (spreadLust.value) {
-        const captainHasLust = team.members.some((m) => classSpecLust[m.character.class]);
-        if (!captainHasLust) {
-          // pick a lust provider
-          // Try to find one that doesn't conflict with captain's role (specifically Healer/Tank)
-          const providerIndex = availableLustProviders.findIndex((m) => {
-            // If team has Healer, avoid Healer Lust
-            if (team.members.find(isHealer) && isHealer(m)) return false;
-            // If team has Tank, avoid Tank Lust (though none exist currently)
-            if (team.members.find(isTank) && isTank(m)) return false;
-            return true;
-          });
-
-          if (providerIndex !== -1) {
-            const lust = availableLustProviders[providerIndex];
-            pruneWorkingMembers(lust);
-            team.members.push(lust);
-            availableLustProviders.splice(providerIndex, 1);
-          }
-        }
-      }
     }
+
+    // Roles are assigned one whole pass at a time (every team gets a tank before
+    // any team gets a healer, etc.). This reserves the scarce tank/healer roles
+    // across all teams before damage dealers are handed out, which matters when
+    // players can fill multiple roles - otherwise a flex player could be spent as
+    // a dps on an early team and leave a later team with no tank/healer.
+    //
+    // Lust used to be a separate pass that ran *before* roles were assigned. When
+    // there were more team slots than completable teams (e.g. 2 tanks / 2 healers
+    // but ceil(players / 5) === 3 slots), that pre-pass let a doomed trailing slot
+    // grab a scarce lust-capable healer, starving an otherwise-completable team so
+    // it was silently dropped. Lust is now folded into the role passes as a
+    // preference - only ever picked to fill a slot the team needs anyway (its
+    // healer or a dps) - so spreading lust can no longer consume a scarce role a
+    // sibling team requires.
 
     // assign tanks
     for (const team of workingTeams) {
-      // skip if team captain was a tank
       if (team.members.find(isTank)) continue;
       const tank = workingMembers.find(isTank);
       if (tank) {
@@ -425,26 +403,33 @@ export const useMembersStore = defineStore('members', () => {
       }
     }
 
-    // assign healers
+    // assign healers, preferring a lust-capable healer when the team has no lust
+    // yet (a lust healer satisfies both needs without taking a dps slot)
     for (const team of workingTeams) {
-      // skip if team captain / lust was a healer
       if (team.members.find(isHealer)) continue;
-      const healer = workingMembers.find(isHealer);
+      let healer: Member | undefined;
+      if (spreadLust.value && !hasLust(team)) {
+        healer = workingMembers.find((m) => isHealer(m) && classSpecLust[m.character.class]);
+      }
+      if (!healer) healer = workingMembers.find(isHealer);
       if (healer) {
         pruneWorkingMembers(healer);
         team.members.push(healer);
       }
     }
 
-    // assign damage dealers
+    // assign damage dealers, filling each team to three before moving on and
+    // preferring a lust-capable dps while the team still has no lust provider
     for (const team of workingTeams) {
-      for (let i = 0; i < 3; i++) {
-        if (team.members.filter(isDamageDealer).length === 3) continue;
-        const dps = workingMembers.find(isDamageDealer);
-        if (dps) {
-          pruneWorkingMembers(dps);
-          team.members.push(dps);
+      while (team.members.filter(isDamageDealer).length < 3) {
+        let dps: Member | undefined;
+        if (spreadLust.value && !hasLust(team)) {
+          dps = workingMembers.find((m) => isDamageDealer(m) && classSpecLust[m.character.class]);
         }
+        if (!dps) dps = workingMembers.find(isDamageDealer);
+        if (!dps) break;
+        pruneWorkingMembers(dps);
+        team.members.push(dps);
       }
     }
 

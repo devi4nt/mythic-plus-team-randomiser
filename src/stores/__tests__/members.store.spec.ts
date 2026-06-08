@@ -5,7 +5,7 @@ import { useMembersStore } from '../members.store';
 import { useConfigStore } from '../config.store';
 import { useTeamsStore } from '../teams.store';
 import { nextTick, ref, type Ref } from 'vue';
-import type { GuildProfile, Member } from '../../types';
+import type { GuildProfile, Member, ClassRole } from '../../types';
 import { mockGuildProfile } from '../../data/__mocks__/mock-guild-profile';
 import { useAlertStore } from '../alert.store';
 import { mockMembers } from '../../data/__mocks__/mock-members';
@@ -593,133 +593,255 @@ describe('members store', () => {
     expect(teams.teams.length).toBe(2);
     for (const team of teams.teams) {
       expect(team.members.length).toBe(5);
-      expect(
-        team.members.filter((m) => m.character.active_spec_role === 'TANK').length
-      ).toBe(1);
-      expect(
-        team.members.filter((m) => m.character.active_spec_role === 'HEALING').length
-      ).toBe(1);
-      expect(
-        team.members.filter((m) => m.character.active_spec_role === 'DPS').length
-      ).toBe(3);
+      expect(team.members.filter((m) => m.character.active_spec_role === 'TANK').length).toBe(1);
+      expect(team.members.filter((m) => m.character.active_spec_role === 'HEALING').length).toBe(1);
+      expect(team.members.filter((m) => m.character.active_spec_role === 'DPS').length).toBe(3);
     }
   });
 
-  test('it handles multi-spec lust players without depleting healer pool', { repeats: 25 }, async () => {
-    const store = useMembersStore();
-    const config = useConfigStore();
-    const teams = useTeamsStore();
+  test(
+    'it handles multi-spec lust players without depleting healer pool',
+    { repeats: 25 },
+    async () => {
+      const store = useMembersStore();
+      const config = useConfigStore();
+      const teams = useTeamsStore();
 
-    config.spreadLust = true;
-    config.autoPug = false;
-    config.fancy = false;
+      config.spreadLust = true;
+      config.autoPug = false;
+      config.fancy = false;
 
-    // Shaman selected with both Resto (HEALING) and Enhance (DPS) specs
-    // If the DPS entry is used as lust, pruneWorkingMembers removes the healer entry too,
-    // depleting the healer pool and leaving another team without a healer
-    const members: Member[] = [
-      {
-        character: {
-          name: 'FlexShaman',
-          class: 'Shaman',
-          active_spec_name: 'Restoration',
-          active_spec_role: 'HEALING',
-          realm: 'Test'
+      // Shaman selected with both Resto (HEALING) and Enhance (DPS) specs
+      // If the DPS entry is used as lust, pruneWorkingMembers removes the healer entry too,
+      // depleting the healer pool and leaving another team without a healer
+      const members: Member[] = [
+        {
+          character: {
+            name: 'FlexShaman',
+            class: 'Shaman',
+            active_spec_name: 'Restoration',
+            active_spec_role: 'HEALING',
+            realm: 'Test'
+          },
+          rank: 1
         },
-        rank: 1
-      },
-      {
-        character: {
-          name: 'FlexShaman',
-          class: 'Shaman',
-          active_spec_name: 'Enhancement',
-          active_spec_role: 'DPS',
-          realm: 'Test'
+        {
+          character: {
+            name: 'FlexShaman',
+            class: 'Shaman',
+            active_spec_name: 'Enhancement',
+            active_spec_role: 'DPS',
+            realm: 'Test'
+          },
+          rank: 1
         },
-        rank: 1
-      },
-      {
-        character: {
-          name: 'Healer2',
-          class: 'Paladin',
-          active_spec_name: 'Holy',
-          active_spec_role: 'HEALING',
-          realm: 'Test'
+        {
+          character: {
+            name: 'Healer2',
+            class: 'Paladin',
+            active_spec_name: 'Holy',
+            active_spec_role: 'HEALING',
+            realm: 'Test'
+          },
+          rank: 1
         },
-        rank: 1
-      },
-      {
-        character: {
-          name: 'Tank1',
-          class: 'Warrior',
-          active_spec_name: 'Protection',
-          active_spec_role: 'TANK',
-          realm: 'Test'
+        {
+          character: {
+            name: 'Tank1',
+            class: 'Warrior',
+            active_spec_name: 'Protection',
+            active_spec_role: 'TANK',
+            realm: 'Test'
+          },
+          rank: 1
         },
-        rank: 1
-      },
-      {
-        character: {
-          name: 'Tank2',
-          class: 'Death Knight',
-          active_spec_name: 'Blood',
-          active_spec_role: 'TANK',
-          realm: 'Test'
+        {
+          character: {
+            name: 'Tank2',
+            class: 'Death Knight',
+            active_spec_name: 'Blood',
+            active_spec_role: 'TANK',
+            realm: 'Test'
+          },
+          rank: 1
         },
-        rank: 1
-      },
-      {
-        character: {
-          name: 'LustDPS',
-          class: 'Mage',
-          active_spec_name: 'Fire',
-          active_spec_role: 'DPS',
-          realm: 'Test'
+        {
+          character: {
+            name: 'LustDPS',
+            class: 'Mage',
+            active_spec_name: 'Fire',
+            active_spec_role: 'DPS',
+            realm: 'Test'
+          },
+          rank: 1
         },
-        rank: 1
-      },
-      ...Array.from({ length: 5 }, (_, i) => ({
-        character: {
-          name: `DPS${i + 1}`,
-          class: 'Rogue' as const,
-          active_spec_name: 'Outlaw' as const,
-          active_spec_role: 'DPS' as const,
-          realm: 'Test'
-        },
-        rank: 1
-      }))
-    ];
+        ...Array.from({ length: 5 }, (_, i) => ({
+          character: {
+            name: `DPS${i + 1}`,
+            class: 'Rogue' as const,
+            active_spec_name: 'Outlaw' as const,
+            active_spec_role: 'DPS' as const,
+            realm: 'Test'
+          },
+          rank: 1
+        }))
+      ];
 
-    store.selectedMembers = members;
+      store.selectedMembers = members;
 
-    await store.randomise();
+      await store.randomise();
 
-    // 10 unique players = 2 teams (FlexShaman counted once)
-    expect(teams.teams.length).toBe(2);
+      // 10 unique players = 2 teams (FlexShaman counted once)
+      expect(teams.teams.length).toBe(2);
+      for (const team of teams.teams) {
+        expect(team.members.length).toBe(5);
+        expect(team.members.filter((m) => m.character.active_spec_role === 'TANK').length).toBe(1);
+        expect(team.members.filter((m) => m.character.active_spec_role === 'HEALING').length).toBe(
+          1
+        );
+        expect(team.members.filter((m) => m.character.active_spec_role === 'DPS').length).toBe(3);
+
+        // No duplicate players within a team
+        const unique = new Set(team.members.map((m) => `${m.character.name}-${m.character.realm}`));
+        expect(unique.size).toBe(5);
+      }
+
+      // No duplicate players across teams
+      const allPlayers = teams.teams.flatMap((t) =>
+        t.members.map((m) => `${m.character.name}-${m.character.realm}`)
+      );
+      const allUnique = new Set(allPlayers);
+      expect(allUnique.size).toBe(allPlayers.length);
+    }
+  );
+
+  // Regression: when ceil(players / 5) produces more team slots than can be
+  // completed, the trailing (un-completable) slot used to consume a scarce
+  // lust-capable healer, starving a completable team so it was silently dropped.
+  let regId = 0;
+  const mkMember = (
+    cls: Member['character']['class'],
+    spec: Member['character']['active_spec_name'],
+    role: ClassRole
+  ): Member => ({
+    rank: 1,
+    character: {
+      name: `Reg${regId++}`,
+      class: cls,
+      active_spec_name: spec,
+      active_spec_role: role,
+      realm: 'Test'
+    }
+  });
+
+  const assertCompleteTeams = (teams: ReturnType<typeof useTeamsStore>, count: number) => {
+    expect(teams.teams.length).toBe(count);
     for (const team of teams.teams) {
       expect(team.members.length).toBe(5);
-      expect(
-        team.members.filter((m) => m.character.active_spec_role === 'TANK').length
-      ).toBe(1);
-      expect(
-        team.members.filter((m) => m.character.active_spec_role === 'HEALING').length
-      ).toBe(1);
-      expect(
-        team.members.filter((m) => m.character.active_spec_role === 'DPS').length
-      ).toBe(3);
-
-      // No duplicate players within a team
-      const unique = new Set(
-        team.members.map((m) => `${m.character.name}-${m.character.realm}`)
-      );
-      expect(unique.size).toBe(5);
+      expect(team.members.filter((m) => m.character.active_spec_role === 'TANK').length).toBe(1);
+      expect(team.members.filter((m) => m.character.active_spec_role === 'HEALING').length).toBe(1);
+      expect(team.members.filter((m) => m.character.active_spec_role === 'DPS').length).toBe(3);
     }
+  };
 
-    // No duplicate players across teams
-    const allPlayers = teams.teams.flatMap((t) =>
-      t.members.map((m) => `${m.character.name}-${m.character.realm}`)
-    );
-    const allUnique = new Set(allPlayers);
-    expect(allUnique.size).toBe(allPlayers.length);
-  });
+  test(
+    'it forms two complete teams from 2 tanks, 2 healers and surplus dps with lust spread',
+    { repeats: 25, timeout: 30000 },
+    async () => {
+      const store = useMembersStore();
+      const config = useConfigStore();
+      const teams = useTeamsStore();
+      config.spreadLust = true;
+      config.autoPug = false;
+      config.fancy = false;
+
+      // 2 tanks, 2 lust-capable healers, 10 dps (mostly lust) => 14 players.
+      // ceil(14 / 5) === 3 slots but only 2 teams are completable.
+      store.selectedMembers = [
+        mkMember('Warrior', 'Protection', 'TANK'),
+        mkMember('Death Knight', 'Blood', 'TANK'),
+        mkMember('Shaman', 'Restoration', 'HEALING'),
+        mkMember('Evoker', 'Preservation', 'HEALING'),
+        mkMember('Mage', 'Fire', 'DPS'),
+        mkMember('Hunter', 'Marksmanship', 'DPS'),
+        mkMember('Shaman', 'Elemental', 'DPS'),
+        mkMember('Evoker', 'Devastation', 'DPS'),
+        mkMember('Mage', 'Frost', 'DPS'),
+        mkMember('Hunter', 'Beast Mastery', 'DPS'),
+        mkMember('Rogue', 'Outlaw', 'DPS'),
+        mkMember('Warrior', 'Arms', 'DPS'),
+        mkMember('Rogue', 'Assassination', 'DPS'),
+        mkMember('Mage', 'Arcane', 'DPS')
+      ];
+
+      await store.randomise();
+      assertCompleteTeams(teams, 2);
+    }
+  );
+
+  test(
+    'it does not let an un-completable slot starve a team when dps is scarce',
+    { repeats: 25, timeout: 30000 },
+    async () => {
+      const store = useMembersStore();
+      const config = useConfigStore();
+      const teams = useTeamsStore();
+      config.spreadLust = true;
+      config.autoPug = false;
+      config.fancy = false;
+
+      // 3 tanks, 3 healers, only 6 dps => 12 players, ceil = 3 slots but dps only
+      // supports 2 complete teams.
+      store.selectedMembers = [
+        mkMember('Warrior', 'Protection', 'TANK'),
+        mkMember('Death Knight', 'Blood', 'TANK'),
+        mkMember('Monk', 'Brewmaster', 'TANK'),
+        mkMember('Shaman', 'Restoration', 'HEALING'),
+        mkMember('Evoker', 'Preservation', 'HEALING'),
+        mkMember('Priest', 'Holy', 'HEALING'),
+        mkMember('Mage', 'Fire', 'DPS'),
+        mkMember('Hunter', 'Marksmanship', 'DPS'),
+        mkMember('Rogue', 'Outlaw', 'DPS'),
+        mkMember('Warrior', 'Arms', 'DPS'),
+        mkMember('Shaman', 'Elemental', 'DPS'),
+        mkMember('Evoker', 'Devastation', 'DPS')
+      ];
+
+      await store.randomise();
+      assertCompleteTeams(teams, 2);
+    }
+  );
+
+  test(
+    'stale captain flags do not drop a completable team',
+    { repeats: 25, timeout: 30000 },
+    async () => {
+      const store = useMembersStore();
+      const config = useConfigStore();
+      const teams = useTeamsStore();
+      config.spreadLust = true;
+      config.autoPug = false;
+      config.fancy = false;
+
+      const members = [
+        mkMember('Warrior', 'Protection', 'TANK'),
+        mkMember('Death Knight', 'Blood', 'TANK'),
+        mkMember('Shaman', 'Restoration', 'HEALING'),
+        mkMember('Evoker', 'Preservation', 'HEALING'),
+        mkMember('Mage', 'Fire', 'DPS'),
+        mkMember('Hunter', 'Marksmanship', 'DPS'),
+        mkMember('Shaman', 'Elemental', 'DPS'),
+        mkMember('Evoker', 'Devastation', 'DPS'),
+        mkMember('Mage', 'Frost', 'DPS'),
+        mkMember('Rogue', 'Outlaw', 'DPS')
+      ];
+      // a previous randomisation left stale captain flags behind
+      members[2].captain = true;
+      members[4].captain = true;
+      store.selectedMembers = members;
+
+      await store.randomise();
+      assertCompleteTeams(teams, 2);
+    }
+  );
 });
